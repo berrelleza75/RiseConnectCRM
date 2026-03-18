@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.register-realtor-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+}
+
+/* LEFT SIDE */
+.register-realtor-left {
+  width: 45%;
+  background-color: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInLeft 0.8s ease forwards;
+}
+
+.register-realtor-brand {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+
+.register-realtor-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #c9a84c, #f0d080);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0a1628;
+  margin: 0 auto 1.5rem;
+}
+
+.register-realtor-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.register-realtor-title span {
+  color: #c9a84c;
+}
+
+.register-realtor-tagline {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #8a9ab5;
+  line-height: 1.6;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* DECORATIVE CIRCLES */
+.register-realtor-decoration {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+.c1 {
+  width: 300px;
+  height: 300px;
+  bottom: -80px;
+  left: -80px;
+}
+
+.c2 {
+  width: 200px;
+  height: 200px;
+  top: -50px;
+  right: -50px;
+}
+
+.c3 {
+  width: 150px;
+  height: 150px;
+  bottom: 60px;
+  right: 20px;
+}
+
+/* RIGHT SIDE */
+.register-realtor-right {
+  width: 55%;
+  background-color: #f7f6f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  animation: fadeInRight 0.8s ease forwards;
+}
+
+.register-realtor-form-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 2rem;
+}
+
+.register-realtor-form-header {
+  margin-bottom: 2rem;
+}
+
+.register-realtor-form-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0a1628;
+}
+
+.register-realtor-form-header p {
+  font-size: 0.9rem;
+  color: #8a9ab5;
+  margin-top: 0.4rem;
+}
+
+/* FORM */
+.register-realtor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #0a1628;
+  letter-spacing: 0.3px;
+}
+
+.form-group input {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #ddd8cc;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: #0a1628;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.form-group input:focus {
+  border-color: #c9a84c;
+}
+
+.register-realtor-btn-submit {
+  margin-top: 0.5rem;
+  padding: 0.85rem;
+  background-color: #0a1628;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  width: 100%;
+}
+
+.register-realtor-btn-submit:hover {
+  background-color: #c9a84c;
+  color: #0a1628;
+}
+
+.register-realtor-btn-submit:active {
+  transform: scale(0.98);
+}
+
+.back-btn-realtor {
+  width: 100%;
+  padding: 0.85rem;
+  background: transparent;
+  border: 1.5px solid #ddd8cc;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0a1628;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn-realtor:hover {
+  border-color: #c9a84c;
+  color: #c9a84c;
+}
+
+/* FOOTER */
+.register-realtor-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #8a9ab5;
+}
+
+.register-realtor-footer a {
+  color: #c9a84c;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-realtor-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ANIMATIONS */
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
