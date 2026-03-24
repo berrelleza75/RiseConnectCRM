@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api';
+const API_URL = 'https://riseconnectcrm.onrender.com/api'
 
 export const registerOffice = async (formData) => {
     const response = await fetch(`${API_URL}/auth/register/office`, {
