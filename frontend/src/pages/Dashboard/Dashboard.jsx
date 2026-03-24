@@ -3,8 +3,6 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import './Dashboard.css';
 
 function Dashboard() {
-  const token = localStorage.getItem('token');
-  const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
 
   const stats = [
     { label: 'Total Prospects', value: '-', trend: '', color: '#c9a84c', bg: 'rgba(201,168,76,0.1)' },
