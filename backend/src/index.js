@@ -10,7 +10,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: 'https://rise-connect-crm.vercel.app'
+  origin: [
+    'https://rise-connect-cgeoybclb-jesus-berrellezas-projects.vercel.app'
+  ]
 }));
 app.use(express.json());
 
