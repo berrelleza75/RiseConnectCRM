@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './RegisterOffice.css';
 import { useNavigate } from 'react-router-dom';
+import { registerOffice } from '../../services/authService';
 
 function RegisterOffice() {
   const [form, setForm] = useState({
@@ -17,9 +18,15 @@ function RegisterOffice() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    try {
+        const result = await registerOffice(form);
+        console.log(result);
+        navigate('/'); // redirige al login
+    } catch (error) {
+        alert(error.message);
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RegisterRealtor.css';
+import { registerRealtor } from '../../services/authService';
 
 function RegisterRealtor() {
   const navigate = useNavigate();
@@ -17,9 +18,15 @@ function RegisterRealtor() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(form);
+    try {
+        const result = await registerRealtor(form);
+        console.log(result);
+        navigate('/');
+    } catch (error) {
+        alert(error.message);
+    }
   };
 
   return (
