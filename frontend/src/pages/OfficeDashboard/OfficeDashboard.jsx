@@ -1,9 +1,9 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import './Dashboard.css';
+import './OfficeDashboard.css';
 
 
-function Dashboard() {
+function OfficeDashboard() {
 
   const stats = [
     { label: 'Total Prospects', value: '-', trend: '', color: '#c9a84c', bg: 'rgba(201,168,76,0.1)' },
@@ -78,4 +78,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default OfficeDashboard;

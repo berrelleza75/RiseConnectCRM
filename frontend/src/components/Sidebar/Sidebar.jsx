@@ -7,31 +7,31 @@ const navItems = [
   {
     section: 'Workspace',
     items: [
-      { label: 'Dashboard', path: '/dashboard', icon: 'grid' },
-      { label: 'Prospects', path: '/dashboard/prospects', icon: 'users' },
-      { label: 'Pipeline', path: '/dashboard/pipeline', icon: 'pipeline' },
+      { label: 'Dashboard', path: '/office/dashboard', icon: 'grid' },
+      { label: 'Prospects', path: '/office/prospects', icon: 'users' },
+      { label: 'Pipeline', path: '/office/pipeline', icon: 'pipeline' },
     ]
   },
   {
     section: 'Communication',
     items: [
-      { label: 'Messages', path: '/dashboard/messages', icon: 'chat' },
-      { label: 'Calendar', path: '/dashboard/calendar', icon: 'calendar' },
-      { label: 'Calls', path: '/dashboard/calls', icon: 'phone' },
+      { label: 'Messages', path: '/office/messages', icon: 'chat' },
+      { label: 'Calendar', path: '/office/calendar', icon: 'calendar' },
+      { label: 'Calls', path: '/office/calls', icon: 'phone' },
     ]
   },
   {
     section: 'Office',
     items: [
-      { label: 'Team', path: '/dashboard/team', icon: 'team' },
-      { label: 'Settings', path: '/dashboard/settings', icon: 'settings' },
+      { label: 'Team', path: '/office/team', icon: 'team' },
+      { label: 'Settings', path: '/office/settings', icon: 'settings' },
     ]
   }
 ];
 
 function Sidebar({ active }) {
   const [collapsed, setCollapsed] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
   const initials = payload.first_name && payload.last_name

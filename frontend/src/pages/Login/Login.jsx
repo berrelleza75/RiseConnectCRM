@@ -17,9 +17,11 @@ function Login() {
         localStorage.setItem('role', result.role);
 
         if (result.role === 'realtor') {
-            navigate('/dashboard/realtor');
+            navigate('/realtor/dashboard');
+        } else if (result.role === 'loan_officer') {
+            navigate('/loanofficer/dashboard');
         } else {
-            navigate('/dashboard');
+            navigate('/office/dashboard');
         }
     } catch (error) {
         alert(error.message);
