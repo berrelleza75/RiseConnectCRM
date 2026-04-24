@@ -1,4 +1,5 @@
-const API_URL = 'https://riseconnectcrm.onrender.com/api'
+const API_URL = process.env.REACT_APP_API_URL || 'https://riseconnectcrm.onrender.com/api'
+
 
 export const registerOffice = async (formData) => {
     const response = await fetch(`${API_URL}/auth/register/office`, {

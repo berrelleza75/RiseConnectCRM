@@ -2,6 +2,7 @@ import React from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import './Dashboard.css';
 
+
 function Dashboard() {
 
   const stats = [
@@ -24,7 +25,7 @@ function Dashboard() {
               </svg>
               <div className="db-notif-dot"></div>
             </div>
-            <button className="db-cta">+ New Prospect</button>
+            <button className="db-cta">New Updates</button>
           </div>
         </div>
 

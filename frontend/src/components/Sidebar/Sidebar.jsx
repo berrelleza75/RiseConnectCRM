@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const navItems = [
   {
@@ -29,6 +31,7 @@ const navItems = [
 
 function Sidebar({ active }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate(); 
   const token = localStorage.getItem('token');
   const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
   const initials = payload.first_name && payload.last_name
@@ -38,13 +41,15 @@ function Sidebar({ active }) {
   return (
     <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="sb-head">
-        <div className="sb-logo">
-          
-          <div className="sb-brand-txt">
-            <div className="sb-brand-name">Rise<em>Connect</em></div>
-            <div className="sb-brand-tag">{payload.first_name} {payload.last_name}</div>
+        {!collapsed && (
+          <div className="sb-logo">
+            <img src="/logo.png" alt="RiseConnect" className="sb-logo-img" />
+            <div className="sb-brand-txt">
+              <div className="sb-brand-name">Rise<em>Connect</em></div>
+              <div className="sb-brand-tag">{payload.first_name} {payload.last_name}</div>
+            </div>
           </div>
-        </div>
+        )}
         <button className="sb-toggle" onClick={() => setCollapsed(!collapsed)}>
           <ChevronIcon />
         </button>
@@ -58,6 +63,8 @@ function Sidebar({ active }) {
               <div
                 key={item.label}
                 className={`sb-item ${active === item.label ? 'on' : ''}`}
+                onClick={() => navigate(item.path)}
+                style={{ cursor: 'pointer' }}
               >
                 <SbIcon name={item.icon} />
                 <span className="sb-lbl">{item.label}</span>
@@ -70,11 +77,15 @@ function Sidebar({ active }) {
       <div className="sb-footer">
         <div className="sb-user">
           <div className="sb-av">{initials}</div>
-          <div className="sb-uinfo">
-            <div className="sb-uname">{payload.first_name} {payload.last_name}</div>
-            <div className="sb-urole">Administrator</div>
-          </div>
-          <LogoutIcon />
+          {!collapsed && (
+            <>
+              <div className="sb-uinfo">
+                <div className="sb-uname">{payload.first_name} {payload.last_name}</div>
+                <div className="sb-urole">Administrator</div>
+              </div>
+              <LogoutIcon />
+            </>
+          )}
         </div>
       </div>
     </aside>

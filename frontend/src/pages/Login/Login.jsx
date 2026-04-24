@@ -30,7 +30,7 @@ function Login() {
     <div className="login-wrapper">
       <div className="login-left">
         <div className="login-brand">
-          <div className="login-logo">RC</div>
+          <img src="/logo.png" alt="RiseConnect" className="login-logo" />
           <h1 className="login-title">RiseConnect<span>CRM</span></h1>
           <p className="login-tagline">Bridging Mortgage & Real Estate professionals in one powerful platform.</p>
         </div>
