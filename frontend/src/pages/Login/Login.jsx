@@ -85,7 +85,6 @@ function Login() {
 
           <div className="register-options">
             <button className="register-btn" onClick={() => navigate('/register/office')}>I'm Mortgage Office</button>
-            <button className="register-btn" onClick={() => navigate('/register/realtor')}>I'm Realtor</button>
           </div>
         </div>
       </div>

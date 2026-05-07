@@ -1,7 +1,7 @@
 import React from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
+import Topbar from '../../components/Topbar/Topbar';
 import './OfficeDashboard.css';
-
 
 function OfficeDashboard() {
 
@@ -13,23 +13,19 @@ function OfficeDashboard() {
   ];
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="page-wrapper">
       <Sidebar active="Dashboard" />
-      <div className="dashboard-main">
-        <div className="db-topbar">
-            <div/>
-          <div className="db-topbar-right">
-            <div className="db-notif">
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="#9a8f80">
-                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zm0 16a2 2 0 002-2H8a2 2 0 002 2z"/>
-              </svg>
-              <div className="db-notif-dot"></div>
-            </div>
-            <button className="db-cta">New Updates</button>
-          </div>
-        </div>
+      <div className="page-main">
+        <Topbar />
 
-        <div className="db-content">
+        <div className="page-content">
+          <div className="page-header">
+            <div className="page-header-left">
+              <h1 className="page-title">Dashboard</h1>
+              <span className="page-subtitle">Welcome back</span>
+            </div>
+          </div>
+
           <div className="db-stats">
             {stats.map((stat) => (
               <div className="stat-card" key={stat.label} style={{ '--ac': stat.color, '--ac-bg': stat.bg }}>
@@ -54,7 +50,7 @@ function OfficeDashboard() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td colSpan="4" style={{ textAlign: 'center', padding: '24px', color: '#9a8f80', fontSize: '13px' }}>
+                    <td colSpan="4" className="db-empty-row">
                       No prospects yet
                     </td>
                   </tr>
@@ -67,7 +63,7 @@ function OfficeDashboard() {
                 <span className="db-panel-title">Upcoming Appointments</span>
                 <span className="db-panel-link">View all →</span>
               </div>
-              <div style={{ textAlign: 'center', padding: '24px', color: '#9a8f80', fontSize: '13px' }}>
+              <div className="db-empty-block">
                 No appointments yet
               </div>
             </div>

@@ -10,12 +10,33 @@ export const registerOfficeService = async ({ firstName, lastName, email, phone,
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const [result] = await pool.query(
-        'INSERT INTO users (office_id, first_name, last_name, email, password, role, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [null, firstName, lastName, email, hashedPassword, 'admin', phone, 'active']
-    );
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
 
-    return { userId: result.insertId };
+        const officeName = `${firstName} ${lastName} Mortgage Office`;
+
+        const [officeResult] = await conn.query(
+            'INSERT INTO offices (name, phone) VALUES (?, ?)',
+            [officeName, phone || null]
+        );
+
+        const officeId = officeResult.insertId;
+
+        const [userResult] = await conn.query(
+            'INSERT INTO users (office_id, first_name, last_name, email, password, role, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [officeId, firstName, lastName, email, hashedPassword, 'admin', phone, 'active']
+        );
+
+        await conn.commit();
+
+        return { userId: userResult.insertId, officeId };
+    } catch (error) {
+        await conn.rollback();
+        throw error;
+    } finally {
+        conn.release();
+    }
 };
 
 export const registerRealtorService = async ({ firstName, lastName, email, phone, password }) => {

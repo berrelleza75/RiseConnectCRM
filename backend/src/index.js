@@ -3,7 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pool from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-import prospectsRoutes from './routes/prospectsRoutes.js'; 
+import contactsRoutes from './routes/contactsRoutes.js';
+import leadsRoutes from './routes/leadsRoutes.js';
 
 dotenv.config();
 
@@ -22,7 +23,8 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/prospects', prospectsRoutes); 
+app.use('/api/contacts', contactsRoutes);
+app.use('/api/leads', leadsRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {
