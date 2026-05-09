@@ -46,6 +46,25 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/contact/:contactId', async (req, res) => {
+    const { contactId } = req.params;
+    try {
+        const [rows] = await pool.query(
+            `SELECT l.id, l.contact_id, l.office_id, l.status, l.loan_purpose, l.loan_type,
+                    l.base_loan_amount, l.created_at, l.closed_at, l.assigned_to,
+                    u.first_name AS assigned_first_name, u.last_name AS assigned_last_name
+             FROM loans l
+             LEFT JOIN users u ON l.assigned_to = u.id
+             WHERE l.contact_id = ?
+             ORDER BY l.created_at DESC`,
+            [contactId]
+        );
+        res.json(rows);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching loans for contact', error: error.message });
+    }
+});
+
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {

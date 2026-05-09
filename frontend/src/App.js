@@ -8,6 +8,7 @@ import Leads from './pages/Leads/Leads';
 import LeadDetail from './pages/Leads/LeadDetail';
 import Loans from './pages/Loans/Loans';
 import LoanDetail from './pages/Loans/LoanDetail';
+import Messages from './pages/Messages/Messages';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/office/leads/:id" element={<LeadDetail />} />
         <Route path="/office/loans" element={<Loans />} />
         <Route path="/office/loans/:id" element={<LoanDetail />} />
+        <Route path="/office/messages" element={<Messages />} />
       </Routes>
     </Router>
   );

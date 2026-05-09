@@ -18,8 +18,8 @@ const formatNumber = (n) => {
 
 const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
-export default function Dialer({ onClose }) {
-    const [number, setNumber]       = useState('');
+export default function Dialer({ onClose, initialNumber = '' }) {
+    const [number, setNumber]       = useState(initialNumber);
     const [status, setStatus]       = useState('loading');
     const [statusMsg, setStatusMsg] = useState('Connecting...');
     const [duration, setDuration]   = useState(0);
