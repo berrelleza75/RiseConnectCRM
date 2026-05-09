@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Topbar from '../../components/Topbar/Topbar';
+import CustomSelect from '../../components/CustomSelect/CustomSelect';
 import { getLeads, createLead, updateLead, deleteLead } from '../../services/leadsService';
 import { getContacts } from '../../services/contactsService';
+import { createLoan } from '../../services/loansService';
 import './Leads.css';
 
 function Leads() {
@@ -16,9 +19,12 @@ function Leads() {
     const [showNewModal, setShowNewModal] = useState(false);
     const [selectedContactId, setSelectedContactId] = useState('');
     const [leadToDelete, setLeadToDelete] = useState(null);
+    const [leadToConvert, setLeadToConvert] = useState(null);
+    const [converting, setConverting] = useState(false);
     const [successMessage, setSuccessMessage] = useState(null);
     const menuRef = useRef(null);
 
+    const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
     const currentOfficeId = payload.office_id;
@@ -113,10 +119,63 @@ function Leads() {
         }
     };
 
+    const handleConvertToLoan = async () => {
+        if (!leadToConvert || converting) return;
+        setConverting(true);
+        try {
+            await createLoan({
+                contact_id: leadToConvert.contact_id,
+                lead_id: leadToConvert.id,
+                office_id: currentOfficeId,
+                assigned_to: leadToConvert.assigned_to || null,
+                loan_purpose: leadToConvert.loan_purpose || null,
+                subject_property_tbd: leadToConvert.subject_property_tbd,
+                property_street: leadToConvert.street_address || null,
+                property_unit: leadToConvert.unit_apt || null,
+                property_city: leadToConvert.city || null,
+                property_state: leadToConvert.state || null,
+                property_postal: leadToConvert.postal_code || null,
+                property_county: leadToConvert.county || null,
+                property_type: leadToConvert.property_type || null,
+                property_occupancy: leadToConvert.property_occupancy || null,
+                purchase_price: leadToConvert.purchase_price || null,
+                buying_stage: leadToConvert.buying_stage || null,
+                first_time_home_buyer: leadToConvert.first_time_home_buyer,
+                has_real_estate_agent: leadToConvert.has_real_estate_agent,
+                desired_monthly_payment: leadToConvert.desired_monthly_payment || null,
+                current_interest_rate: leadToConvert.current_interest_rate || null,
+                currently_owning_home: leadToConvert.currently_owning_home,
+                planning_to_sell: leadToConvert.planning_to_sell,
+                gross_annual_income: leadToConvert.gross_annual_income || null,
+                employment_type: leadToConvert.employment_type || null,
+                military_service: leadToConvert.military_service,
+                current_occupancy: leadToConvert.current_occupancy || null,
+                monthly_rent_amount: leadToConvert.monthly_rent_amount || null,
+                lead_provided_by: leadToConvert.lead_provided_by || null,
+                lead_source: leadToConvert.lead_source || null,
+                other_lead_source_description: leadToConvert.other_lead_source_description || null,
+                dnc_request: leadToConvert.dnc_request ?? false,
+                email_opt_out: leadToConvert.email_opt_out ?? false,
+                sms_opt_out: leadToConvert.sms_opt_out ?? false,
+            });
+            await updateLead(leadToConvert.id, { status: 'converted' });
+            setLeadToConvert(null);
+            setSuccessMessage(`Loan created for ${leadToConvert.contact_first_name} ${leadToConvert.contact_last_name}.`);
+            loadLeads();
+        } catch (err) {
+            setError(err.message);
+            setLeadToConvert(null);
+        } finally {
+            setConverting(false);
+        }
+    };
+
     const handleMenuAction = (action, lead) => {
         setOpenMenuId(null);
         if (action === 'delete') {
             setLeadToDelete(lead);
+        } else if (action === 'convert') {
+            setLeadToConvert(lead);
         } else if (action === 'qualified') {
             handleStatusChange(lead, 'qualified');
         } else if (action === 'lost') {
@@ -223,11 +282,15 @@ function Leads() {
                                 </thead>
                                 <tbody>
                                     {filteredLeads.map(lead => (
-                                        <tr key={lead.id}>
+                                        <tr
+                                            key={lead.id}
+                                            onClick={() => navigate(`/office/leads/${lead.id}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <td>
                                                 <div className="ld-row">
                                                     <div className="ld-av">
-                                                        {lead.contact_first_name[0]}{lead.contact_last_name[0]}
+                                                        {lead.contact_first_name?.[0]}{lead.contact_last_name?.[0]}
                                                     </div>
                                                     <div>
                                                         <div className="ld-name">
@@ -250,7 +313,7 @@ function Leads() {
                                                     : <span className="ld-muted">Unassigned</span>}
                                             </td>
                                             <td className="ld-date">{new Date(lead.created_at).toLocaleDateString()}</td>
-                                            <td className="ld-actions-cell">
+                                            <td className="ld-actions-cell" onClick={(e) => e.stopPropagation()}>
                                                 <div className="ld-menu-wrapper" ref={openMenuId === lead.id ? menuRef : null}>
                                                     <button
                                                         className="ld-menu-btn"
@@ -262,12 +325,16 @@ function Leads() {
                                                     </button>
                                                     {openMenuId === lead.id && (
                                                         <div className="ld-menu">
-                                                            <button className="ld-menu-item ld-menu-item-disabled" disabled>
+                                                            <button
+                                                                className={`ld-menu-item ${lead.status === 'converted' ? 'ld-menu-item-disabled' : ''}`}
+                                                                disabled={lead.status === 'converted'}
+                                                                onClick={() => handleMenuAction('convert', lead)}
+                                                            >
                                                                 <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
                                                                     <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zm14 5H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"/>
                                                                 </svg>
                                                                 Convert to Loan
-                                                                <span className="ld-menu-soon">Soon</span>
+                                                                {lead.status === 'converted' && <span className="ld-menu-soon">Done</span>}
                                                             </button>
                                                             <button
                                                                 className="ld-menu-item"
@@ -321,18 +388,18 @@ function Leads() {
                         <form onSubmit={handleCreateLead} className="ld-form">
                             <div className="ld-field">
                                 <label>Select Contact *</label>
-                                <select
+                                <CustomSelect
+                                    name="contact_id"
                                     value={selectedContactId}
                                     onChange={(e) => setSelectedContactId(e.target.value)}
-                                    required
-                                >
-                                    <option value="">-- Select a contact --</option>
-                                    {contacts.map(c => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.first_name} {c.last_name} {c.email ? `(${c.email})` : ''}
-                                        </option>
-                                    ))}
-                                </select>
+                                    options={[
+                                        { value: '', label: '— Select a contact —' },
+                                        ...contacts.map(c => ({
+                                            value: String(c.id),
+                                            label: `${c.first_name} ${c.last_name}${c.email ? ` (${c.email})` : ''}`
+                                        }))
+                                    ]}
+                                />
                                 <p className="ld-field-hint">
                                     Don't see your contact? Add it first from the Contacts section.
                                 </p>
@@ -369,6 +436,31 @@ function Leads() {
                             </button>
                             <button className="ld-confirm-delete-btn" onClick={handleConfirmDelete}>
                                 Delete lead
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {leadToConvert && (
+                <div className="ld-modal-overlay" onClick={() => !converting && setLeadToConvert(null)}>
+                    <div className="ld-confirm-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="ld-confirm-icon" style={{ color: 'var(--color-primary)' }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+                            </svg>
+                        </div>
+                        <h2 className="ld-confirm-title">Convert to Loan</h2>
+                        <p className="ld-confirm-text">
+                            Create a loan application for <strong>{leadToConvert.contact_first_name} {leadToConvert.contact_last_name}</strong>? The lead will be marked as converted and you can fill in the full loan details on the loan page.
+                        </p>
+                        <div className="ld-confirm-actions">
+                            <button className="btn-secondary" onClick={() => setLeadToConvert(null)} disabled={converting}>
+                                Cancel
+                            </button>
+                            <button className="btn-primary" onClick={handleConvertToLoan} disabled={converting}>
+                                {converting ? 'Creating...' : 'Create Loan'}
                             </button>
                         </div>
                     </div>

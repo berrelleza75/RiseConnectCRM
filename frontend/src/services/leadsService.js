@@ -39,7 +39,7 @@ export const updateLead = async (id, leadData) => {
         body: JSON.stringify(leadData)
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message);
+    if (!response.ok) throw new Error(data.error || data.message);
     return data;
 };
 

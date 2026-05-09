@@ -1,9 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Topbar from '../../components/Topbar/Topbar';
+import CustomSelect from '../../components/CustomSelect/CustomSelect';
 import { getContacts, createContact, updateContact, deleteContact } from '../../services/contactsService';
 import { createLead } from '../../services/leadsService';
 import './Contacts.css';
+
+const OPT_SOURCE = [
+    { value: 'manual',    label: 'Manual' },
+    { value: 'instagram', label: 'Instagram' },
+    { value: 'facebook',  label: 'Facebook' },
+    { value: 'tiktok',    label: 'TikTok' },
+    { value: 'whatsapp',  label: 'WhatsApp' },
+    { value: 'referral',  label: 'Referral' },
+    { value: 'website',   label: 'Website' },
+    { value: 'other',     label: 'Other' },
+];
+
+const OPT_STATUS = [
+    { value: 'new',       label: 'New' },
+    { value: 'contacted', label: 'Contacted' },
+    { value: 'qualified', label: 'Qualified' },
+    { value: 'archived',  label: 'Archived' },
+];
 
 function Contacts() {
     const [contacts, setContacts] = useState([]);
@@ -387,16 +406,7 @@ function Contacts() {
                             <div className="ct-form-row">
                                 <div className="ct-field">
                                     <label>Source</label>
-                                    <select name="source" value={formData.source} onChange={handleInputChange}>
-                                        <option value="manual">Manual</option>
-                                        <option value="instagram">Instagram</option>
-                                        <option value="facebook">Facebook</option>
-                                        <option value="tiktok">TikTok</option>
-                                        <option value="whatsapp">WhatsApp</option>
-                                        <option value="referral">Referral</option>
-                                        <option value="website">Website</option>
-                                        <option value="other">Other</option>
-                                    </select>
+                                    <CustomSelect name="source" value={formData.source} onChange={handleInputChange} options={OPT_SOURCE} />
                                 </div>
                                 <div className="ct-field">
                                     <label>Source Username</label>
@@ -407,12 +417,7 @@ function Contacts() {
                             {editingContactId && (
                                 <div className="ct-field">
                                     <label>Status</label>
-                                    <select name="status" value={formData.status} onChange={handleInputChange}>
-                                        <option value="new">New</option>
-                                        <option value="contacted">Contacted</option>
-                                        <option value="qualified">Qualified</option>
-                                        <option value="archived">Archived</option>
-                                    </select>
+                                    <CustomSelect name="status" value={formData.status} onChange={handleInputChange} options={OPT_STATUS} />
                                 </div>
                             )}
 

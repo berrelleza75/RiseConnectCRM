@@ -5,6 +5,8 @@ import pool from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import contactsRoutes from './routes/contactsRoutes.js';
 import leadsRoutes from './routes/leadsRoutes.js';
+import loansRoutes from './routes/loansRoutes.js';
+import usersRoutes from './routes/usersRoutes.js';
 
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/leads', leadsRoutes);
+app.use('/api/loans', loansRoutes);
+app.use('/api/users', usersRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

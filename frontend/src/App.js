@@ -5,6 +5,9 @@ import RegisterOffice from './pages/RegisterOffice/RegisterOffice';
 import OfficeDashboard from './pages/OfficeDashboard/OfficeDashboard';
 import Contacts from './pages/Contacts/Contacts';
 import Leads from './pages/Leads/Leads';
+import LeadDetail from './pages/Leads/LeadDetail';
+import Loans from './pages/Loans/Loans';
+import LoanDetail from './pages/Loans/LoanDetail';
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
         <Route path="/office/dashboard" element={<OfficeDashboard />} />
         <Route path="/office/contacts" element={<Contacts />} />
         <Route path="/office/leads" element={<Leads />} />
+        <Route path="/office/leads/:id" element={<LeadDetail />} />
+        <Route path="/office/loans" element={<Loans />} />
+        <Route path="/office/loans/:id" element={<LoanDetail />} />
       </Routes>
     </Router>
   );

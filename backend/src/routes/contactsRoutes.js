@@ -6,13 +6,14 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.query(
-            `SELECT c.id, c.first_name, c.last_name, c.email, c.cell_phone, 
+            `SELECT c.id, c.first_name, c.last_name, c.email, c.cell_phone,
                     c.source, c.source_username, c.status, c.created_at,
                     c.assigned_to,
-                    u.first_name AS assigned_first_name, 
+                    u.first_name AS assigned_first_name,
                     u.last_name AS assigned_last_name
              FROM contacts c
              LEFT JOIN users u ON c.assigned_to = u.id
+             WHERE c.status != 'deleted'
              ORDER BY c.created_at DESC`
         );
         res.json(rows);
@@ -138,7 +139,7 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     try {
-        await pool.query(`DELETE FROM contacts WHERE id = ?`, [req.params.id]);
+        await pool.query(`UPDATE contacts SET status = 'deleted' WHERE id = ?`, [req.params.id]);
         res.json({ message: 'Contact deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting contact', error: error.message });

@@ -11,7 +11,6 @@ const navItems = [
       { label: 'Contacts', path: '/office/contacts', icon: 'users' },
       { label: 'Leads', path: '/office/leads', icon: 'leads' },
       { label: 'Loans', path: '/office/loans', icon: 'loans' },
-      { label: 'Pipeline', path: '/office/pipeline', icon: 'pipeline' },
     ]
   },
   {

@@ -6,7 +6,8 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.query(
-            `SELECT l.id, l.contact_id, l.office_id, l.assigned_to, l.loan_purpose,
+            `SELECT l.id, l.contact_id, l.office_id, l.assigned_to,
+                    l.loan_purpose,
                     l.property_type, l.property_occupancy, l.purchase_price,
                     l.buying_stage, l.credit_score_range, l.status,
                     l.created_at, l.closed_at,
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
                     u.first_name AS assigned_first_name,
                     u.last_name AS assigned_last_name
              FROM leads l
-             INNER JOIN contacts c ON l.contact_id = c.id
+             JOIN contacts c ON l.contact_id = c.id
              LEFT JOIN users u ON l.assigned_to = u.id
              ORDER BY l.created_at DESC`
         );
@@ -32,7 +33,7 @@ router.get('/contact/:contactId', async (req, res) => {
     const { contactId } = req.params;
     try {
         const [rows] = await pool.query(
-            `SELECT l.*, 
+            `SELECT l.*,
                     u.first_name AS assigned_first_name,
                     u.last_name AS assigned_last_name
              FROM leads l
@@ -60,7 +61,7 @@ router.get('/:id', async (req, res) => {
                     u.first_name AS assigned_first_name,
                     u.last_name AS assigned_last_name
              FROM leads l
-             INNER JOIN contacts c ON l.contact_id = c.id
+             JOIN contacts c ON l.contact_id = c.id
              LEFT JOIN users u ON l.assigned_to = u.id
              WHERE l.id = ?`,
             [id]
@@ -180,7 +181,7 @@ router.put('/:id', async (req, res) => {
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 updates.push(`${field} = ?`);
-                values.push(req.body[field]);
+                values.push(req.body[field] === '' ? null : req.body[field]);
             }
         }
 

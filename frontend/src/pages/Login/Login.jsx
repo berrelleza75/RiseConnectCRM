@@ -6,11 +6,12 @@ import { loginUser } from '../../services/authService';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
         const result = await loginUser({ email, password });
         localStorage.setItem('token', result.token);
@@ -24,7 +25,7 @@ function Login() {
             navigate('/office/dashboard');
         }
     } catch (error) {
-        alert(error.message);
+        setErrorMessage(error.message);
     }
   };
 
@@ -49,6 +50,17 @@ function Login() {
             <h2>Welcome back</h2>
             <p>Sign in to your account to continue</p>
           </div>
+
+          {errorMessage && (
+              <div className="error-banner">
+                <svg className="error-icon" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                  <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="12" cy="16" r="1" fill="currentColor"/>
+                </svg>
+                <span>{errorMessage}</span>
+              </div>
+          )}
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">

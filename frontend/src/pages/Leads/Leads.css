@@ -163,6 +163,10 @@
     background: var(--color-bg-soft);
 }
 
+.ld-table tbody tr:hover .ld-name {
+    color: var(--color-accent-dark);
+}
+
 .ld-table tbody tr:last-child td {
     border-bottom: none;
 }
