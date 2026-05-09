@@ -7,6 +7,7 @@ import contactsRoutes from './routes/contactsRoutes.js';
 import leadsRoutes from './routes/leadsRoutes.js';
 import loansRoutes from './routes/loansRoutes.js';
 import usersRoutes from './routes/usersRoutes.js';
+import callsRoutes from './routes/callsRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/contacts', contactsRoutes);
 app.use('/api/leads', leadsRoutes);
 app.use('/api/loans', loansRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/calls', callsRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

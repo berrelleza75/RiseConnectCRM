@@ -53,6 +53,30 @@
     border: 1.5px solid #fff;
 }
 
+.topbar-phone-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--color-bg-soft);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #9a8f80;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.topbar-phone-btn:hover {
+    background: #e8f0ea;
+    color: #27500a;
+    border-color: #b5c9a8;
+}
+.topbar-phone-btn.active {
+    background: #27500a;
+    color: #fff;
+    border-color: #27500a;
+}
+
 .topbar-cta {
     background: var(--color-primary);
     color: #fff;

@@ -1,0 +1,239 @@
+.dialer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+}
+
+.dialer {
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    width: 284px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(10, 22, 40, 0.22);
+    border: 1px solid #e5ddd0;
+    overflow: hidden;
+    z-index: 2001;
+    animation: dialer-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes dialer-in {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Header ── */
+.dialer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 16px 10px;
+    border-bottom: 1px solid #f0ebe1;
+}
+.dialer-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0a1628;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.dialer-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #9a8f80;
+    cursor: pointer;
+    padding: 0 2px;
+}
+.dialer-close:hover { color: #0a1628; }
+
+/* ── Status ── */
+.dialer-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9a8f80;
+    background: #faf7f1;
+    border-bottom: 1px solid #f0ebe1;
+}
+.dialer-status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #9a8f80;
+    flex-shrink: 0;
+}
+.dialer-status-loading   { color: #9a8f80; }
+.dialer-status-loading .dialer-status-dot { background: #9a8f80; animation: dialer-pulse 1s infinite; }
+.dialer-status-idle      { color: #27500a; }
+.dialer-status-idle .dialer-status-dot  { background: #27500a; }
+.dialer-status-ready     { color: #27500a; }
+.dialer-status-ready .dialer-status-dot { background: #27500a; }
+.dialer-status-calling   { color: #92680a; }
+.dialer-status-calling .dialer-status-dot { background: #b8860b; animation: dialer-pulse 1s infinite; }
+.dialer-status-active    { color: #27500a; }
+.dialer-status-active .dialer-status-dot { background: #27500a; animation: dialer-pulse 1.2s infinite; }
+.dialer-status-error     { color: #c0392b; }
+.dialer-status-error .dialer-status-dot  { background: #c0392b; }
+@keyframes dialer-pulse {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+
+/* ── Error setup message ── */
+.dialer-setup-msg {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px;
+    background: #fff8f5;
+    margin: 12px;
+    border-radius: 10px;
+    border: 1px solid #f5c6cb;
+    color: #c0392b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.dialer-setup-msg svg { flex-shrink: 0; margin-top: 1px; }
+.dialer-setup-msg strong { display: block; font-size: 13px; margin-bottom: 4px; color: #a93226; }
+.dialer-setup-msg p { margin: 0; color: #7f3b34; }
+.dialer-setup-msg code {
+    background: rgba(192,57,43,0.08);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-family: monospace;
+    font-size: 11px;
+}
+
+/* ── Timer ── */
+.dialer-timer {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #27500a;
+    letter-spacing: 0.08em;
+    padding: 10px 0 4px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Display / Input ── */
+.dialer-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 14px 8px;
+}
+.dialer-number-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 22px;
+    font-weight: 600;
+    color: #0a1628;
+    letter-spacing: 0.04em;
+    width: 0;
+    font-family: inherit;
+}
+.dialer-number-input::placeholder { color: #b5aa9a; font-weight: 400; font-size: 16px; }
+.dialer-number-input:read-only { opacity: 0.6; }
+
+.dialer-backspace {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #9a8f80;
+    padding: 6px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.dialer-backspace:hover:not(:disabled) { background: #f0ebe1; color: #0a1628; }
+.dialer-backspace:disabled { opacity: 0.25; cursor: default; }
+
+/* ── Number preview (auto-formatted) ── */
+.dialer-preview {
+    font-size: 11px;
+    color: #27500a;
+    padding: 0 14px 6px;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+}
+
+/* ── Dial Pad ── */
+.dialer-pad {
+    padding: 4px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.dialer-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+.dialer-key {
+    background: #f5f1ea;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0a1628;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.08s;
+    user-select: none;
+    font-family: inherit;
+}
+.dialer-key:hover:not(:disabled) { background: #e5ddd0; }
+.dialer-key:active:not(:disabled) { transform: scale(0.91); background: #d4c9b8; }
+.dialer-key:disabled { opacity: 0.35; cursor: default; }
+
+/* ── Actions ── */
+.dialer-actions {
+    padding: 4px 12px 10px;
+}
+.dialer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.08s;
+}
+.dialer-btn:active { transform: scale(0.97); }
+.dialer-btn-call {
+    background: #27500a;
+    color: #fff;
+}
+.dialer-btn-call:hover:not(:disabled) { background: #1e3d07; }
+.dialer-btn-call:disabled { background: #b5c9a8; cursor: not-allowed; }
+.dialer-btn-hangup {
+    background: #c0392b;
+    color: #fff;
+}
+.dialer-btn-hangup:hover { background: #a93226; }
+
+.dialer-hint {
+    font-size: 12px;
+    opacity: 0.6;
+    font-weight: 400;
+    margin-left: 2px;
+}
+
+/* ── Keyboard hint ── */
+.dialer-keyboard-hint {
+    text-align: center;
+    font-size: 11px;
+    color: #b5aa9a;
+    padding: 0 12px 12px;
+}
