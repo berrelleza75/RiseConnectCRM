@@ -9,6 +9,8 @@ import loansRoutes from './routes/loansRoutes.js';
 import usersRoutes from './routes/usersRoutes.js';
 import callsRoutes from './routes/callsRoutes.js';
 import messagesRoutes from './routes/messagesRoutes.js';
+import appointmentsRoutes from './routes/appointmentsRoutes.js';
+import officesRoutes from './routes/officesRoutes.js';
 
 dotenv.config();
 
@@ -25,6 +27,7 @@ app.use(cors({
   }
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactsRoutes);
@@ -33,6 +36,8 @@ app.use('/api/loans', loansRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/calls', callsRoutes);
 app.use('/api/messages', messagesRoutes);
+app.use('/api/appointments', appointmentsRoutes);
+app.use('/api/offices', officesRoutes);
 
 app.get('/api/health', async (req, res) => {
     try {

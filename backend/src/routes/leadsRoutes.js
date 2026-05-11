@@ -3,6 +3,27 @@ import pool from '../config/db.js';
 
 const router = express.Router();
 
+router.get('/stats', async (req, res) => {
+    try {
+        const [[{ active }]] = await pool.query(
+            `SELECT COUNT(*) AS active FROM leads WHERE status NOT IN ('converted','lost')`
+        );
+        const [recent] = await pool.query(
+            `SELECT l.id, l.status, l.loan_purpose, l.created_at,
+                    c.first_name AS contact_first_name, c.last_name AS contact_last_name,
+                    c.source AS contact_source,
+                    u.first_name AS assigned_first_name, u.last_name AS assigned_last_name
+             FROM leads l
+             JOIN contacts c ON l.contact_id = c.id
+             LEFT JOIN users u ON l.assigned_to = u.id
+             ORDER BY l.created_at DESC LIMIT 5`
+        );
+        res.json({ active, recent });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.query(

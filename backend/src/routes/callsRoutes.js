@@ -9,8 +9,24 @@ const apiSecret   = process.env.TWILIO_API_SECRET;
 const twimlAppSid = process.env.TWILIO_TWIML_APP_SID;
 const phoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
+const VoiceResponse = twilio.twiml.VoiceResponse;
+
 const AccessToken   = twilio.jwt.AccessToken;
 const VoiceGrant    = AccessToken.VoiceGrant;
+
+// POST /api/calls/twiml — called by Twilio when a browser call is initiated
+router.post('/twiml', (req, res) => {
+    const to = req.body.To;
+    const response = new VoiceResponse();
+    if (to) {
+        const dial = response.dial({ callerId: phoneNumber });
+        dial.number(to);
+    } else {
+        response.say('No destination number provided.');
+    }
+    res.type('text/xml');
+    res.send(response.toString());
+});
 
 router.get('/token', (req, res) => {
     try {

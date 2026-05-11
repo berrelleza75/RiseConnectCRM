@@ -11,6 +11,7 @@ const navItems = [
       { label: 'Contacts', path: '/office/contacts', icon: 'users' },
       { label: 'Leads', path: '/office/leads', icon: 'leads' },
       { label: 'Loans', path: '/office/loans', icon: 'loans' },
+      { label: 'Team', path: '/office/team', icon: 'team' },
     ]
   },
   {
@@ -18,16 +19,8 @@ const navItems = [
     items: [
       { label: 'Messages', path: '/office/messages', icon: 'chat' },
       { label: 'Calendar', path: '/office/calendar', icon: 'calendar' },
-      { label: 'Calls', path: '/office/calls', icon: 'phone' },
     ]
   },
-  {
-    section: 'Office',
-    items: [
-      { label: 'Team', path: '/office/team', icon: 'team' },
-      { label: 'Settings', path: '/office/settings', icon: 'settings' },
-    ]
-  }
 ];
 
 function Sidebar({ active }) {
@@ -76,7 +69,7 @@ function Sidebar({ active }) {
       </nav>
 
       <div className="sb-footer">
-        <div className="sb-user">
+        <div className="sb-user" onClick={() => navigate('/office/profile')} style={{ cursor: 'pointer' }}>
           <div className="sb-av">{initials}</div>
           {!collapsed && (
             <>

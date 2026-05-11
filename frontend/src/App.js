@@ -9,6 +9,9 @@ import LeadDetail from './pages/Leads/LeadDetail';
 import Loans from './pages/Loans/Loans';
 import LoanDetail from './pages/Loans/LoanDetail';
 import Messages from './pages/Messages/Messages';
+import Calendar from './pages/Calendar/Calendar';
+import OfficeProfile from './pages/OfficeProfile/OfficeProfile';
+import Team from './pages/Team/Team';
 
 function App() {
   return (
@@ -23,6 +26,9 @@ function App() {
         <Route path="/office/loans" element={<Loans />} />
         <Route path="/office/loans/:id" element={<LoanDetail />} />
         <Route path="/office/messages" element={<Messages />} />
+        <Route path="/office/calendar" element={<Calendar />} />
+        <Route path="/office/profile" element={<OfficeProfile />} />
+        <Route path="/office/team" element={<Team />} />
       </Routes>
     </Router>
   );

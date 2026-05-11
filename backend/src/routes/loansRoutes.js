@@ -25,6 +25,17 @@ const ALL_FIELDS = [
     'denied_reason',
 ];
 
+router.get('/stats', async (req, res) => {
+    try {
+        const [[{ active }]] = await pool.query(
+            `SELECT COUNT(*) AS active FROM loans WHERE status NOT IN ('closed','denied','withdrawn')`
+        );
+        res.json({ active });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const [rows] = await pool.query(
