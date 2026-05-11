@@ -92,6 +92,7 @@ function LeadDetail() {
     const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
     const currentUserId = payload.id;
     const currentOfficeId = payload.office_id;
+    const isAdmin = payload.role === 'admin';
 
     const loadLead = async () => {
         try {
@@ -366,21 +367,16 @@ function LeadDetail() {
                                 <div className="ldd-card-hd">Team Assignment</div>
                                 <div className="ldd-field">
                                     <label>Loan Officer Assigned</label>
-                                    <CustomSelect
-                                        name="assigned_to"
-                                        value={form.assigned_to}
-                                        onChange={handleChange}
-                                        options={teamOpts}
-                                    />
-                                </div>
-                                <div className="ldd-field" style={{ marginTop: 10 }}>
-                                    <label>Realtor Assigned</label>
-                                    <CustomSelect
-                                        name="realtor_id"
-                                        value={form.realtor_id}
-                                        onChange={handleChange}
-                                        options={teamOpts}
-                                    />
+                                    {isAdmin ? (
+                                        <CustomSelect
+                                            name="assigned_to"
+                                            value={form.assigned_to}
+                                            onChange={handleChange}
+                                            options={teamOpts}
+                                        />
+                                    ) : (
+                                        <div className="ldd-readonly">{lead.assigned_first_name ? `${lead.assigned_first_name} ${lead.assigned_last_name}` : '— Not assigned —'}</div>
+                                    )}
                                 </div>
                             </div>
                         </div>

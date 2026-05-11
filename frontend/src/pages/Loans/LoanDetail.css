@@ -597,3 +597,5 @@
 @media (max-width: 600px) {
     .lnd-g2, .lnd-g3 { grid-template-columns: 1fr; }
 }
+
+.lnd-readonly { padding: 8px 12px; background: var(--color-bg-soft); border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 13px; color: var(--color-text-secondary); }

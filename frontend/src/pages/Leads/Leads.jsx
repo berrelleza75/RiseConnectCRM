@@ -259,10 +259,10 @@ function Leads() {
                                     </svg>
                                 </div>
                                 <div className="ld-empty-title">
-                                    {searchQuery ? 'No leads match your search' : 'No leads yet'}
+                                    {searchQuery ? 'No leads match your search' : 'No leads assigned'}
                                 </div>
                                 <div className="ld-empty-sub">
-                                    {searchQuery ? 'Try a different search term' : 'Convert a contact to lead or create a new one'}
+                                    {searchQuery ? 'Try a different search term' : 'You have no leads assigned to you yet. Ask your admin to assign some.'}
                                 </div>
                             </div>
                         )}

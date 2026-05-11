@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login/Login';
 import RegisterOffice from './pages/RegisterOffice/RegisterOffice';
 import OfficeDashboard from './pages/OfficeDashboard/OfficeDashboard';
@@ -13,13 +13,19 @@ import Calendar from './pages/Calendar/Calendar';
 import OfficeProfile from './pages/OfficeProfile/OfficeProfile';
 import Team from './pages/Team/Team';
 
+function AdminRoute({ element }) {
+    const token = localStorage.getItem('token');
+    const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+    return payload.role === 'admin' ? element : <Navigate to="/office/contacts" replace />;
+}
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register/office" element={<RegisterOffice />} />
-        <Route path="/office/dashboard" element={<OfficeDashboard />} />
+        <Route path="/office/dashboard" element={<AdminRoute element={<OfficeDashboard />} />} />
         <Route path="/office/contacts" element={<Contacts />} />
         <Route path="/office/leads" element={<Leads />} />
         <Route path="/office/leads/:id" element={<LeadDetail />} />
@@ -28,7 +34,7 @@ function App() {
         <Route path="/office/messages" element={<Messages />} />
         <Route path="/office/calendar" element={<Calendar />} />
         <Route path="/office/profile" element={<OfficeProfile />} />
-        <Route path="/office/team" element={<Team />} />
+        <Route path="/office/team" element={<AdminRoute element={<Team />} />} />
       </Routes>
     </Router>
   );

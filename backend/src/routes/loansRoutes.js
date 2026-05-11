@@ -38,6 +38,9 @@ router.get('/stats', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
+        const user = req.user;
+        const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
+        const params = restricted ? [user.id] : [];
         const [rows] = await pool.query(
             `SELECT l.*,
                     c.first_name AS contact_first_name,
@@ -48,8 +51,10 @@ router.get('/', async (req, res) => {
                     u.last_name  AS assigned_last_name
              FROM loans l
              JOIN contacts c ON l.contact_id = c.id
-             LEFT  JOIN users   u ON l.assigned_to = u.id
-             ORDER BY l.created_at DESC`
+             LEFT JOIN users u ON l.assigned_to = u.id
+             ${restricted ? 'WHERE c.assigned_to = ?' : ''}
+             ORDER BY l.created_at DESC`,
+            params
         );
         res.json(rows);
     } catch (error) {
@@ -141,8 +146,13 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ message: 'contact_id and office_id are required' });
         }
 
-        const [[contact]] = await pool.query('SELECT id FROM contacts WHERE id = ?', [contact_id]);
+        const [[contact]] = await pool.query('SELECT id, assigned_to FROM contacts WHERE id = ?', [contact_id]);
         if (!contact) return res.status(404).json({ message: 'Contact not found' });
+
+        // Inherit assigned_to from contact if not explicitly set
+        if (!assigned_to && contact.assigned_to) {
+            req.body.assigned_to = contact.assigned_to;
+        }
 
         const [result] = await pool.query(
             `INSERT INTO loans

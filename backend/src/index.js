@@ -11,6 +11,7 @@ import callsRoutes from './routes/callsRoutes.js';
 import messagesRoutes from './routes/messagesRoutes.js';
 import appointmentsRoutes from './routes/appointmentsRoutes.js';
 import officesRoutes from './routes/officesRoutes.js';
+import { authMiddleware } from './middleware/auth.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(authMiddleware);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/contacts', contactsRoutes);

@@ -3,15 +3,15 @@ import './Sidebar.css';
 import { useNavigate } from 'react-router-dom';
 
 
-const navItems = [
+const allNavItems = [
   {
     section: 'Workspace',
     items: [
-      { label: 'Dashboard', path: '/office/dashboard', icon: 'grid' },
-      { label: 'Contacts', path: '/office/contacts', icon: 'users' },
-      { label: 'Leads', path: '/office/leads', icon: 'leads' },
-      { label: 'Loans', path: '/office/loans', icon: 'loans' },
-      { label: 'Team', path: '/office/team', icon: 'team' },
+      { label: 'Dashboard', path: '/office/dashboard', icon: 'grid',  adminOnly: true },
+      { label: 'Contacts',  path: '/office/contacts',  icon: 'users' },
+      { label: 'Leads',     path: '/office/leads',     icon: 'leads' },
+      { label: 'Loans',     path: '/office/loans',     icon: 'loans' },
+      { label: 'Team',      path: '/office/team',      icon: 'team',  adminOnly: true },
     ]
   },
   {
@@ -28,9 +28,15 @@ function Sidebar({ active }) {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
+  const isAdmin = payload.role === 'admin';
   const initials = payload.first_name && payload.last_name
     ? `${payload.first_name[0]}${payload.last_name[0]}`
     : 'U';
+
+  const navItems = allNavItems.map(group => ({
+    ...group,
+    items: group.items.filter(item => !item.adminOnly || isAdmin),
+  })).filter(group => group.items.length > 0);
 
   return (
     <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>

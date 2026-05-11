@@ -17,12 +17,10 @@ function Login() {
         localStorage.setItem('token', result.token);
         localStorage.setItem('role', result.role);
 
-        if (result.role === 'realtor') {
-            navigate('/realtor/dashboard');
-        } else if (result.role === 'loan_officer') {
-            navigate('/loanofficer/dashboard');
-        } else {
+        if (result.role === 'admin') {
             navigate('/office/dashboard');
+        } else {
+            navigate('/office/contacts');
         }
     } catch (error) {
         setErrorMessage(error.message);

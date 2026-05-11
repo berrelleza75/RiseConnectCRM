@@ -5,6 +5,9 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
+        const user = req.user;
+        const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
+        const params = restricted ? [user.id] : [];
         const [rows] = await pool.query(
             `SELECT c.id, c.first_name, c.last_name, c.email, c.cell_phone,
                     c.source, c.source_username, c.status, c.created_at,
@@ -14,7 +17,9 @@ router.get('/', async (req, res) => {
              FROM contacts c
              LEFT JOIN users u ON c.assigned_to = u.id
              WHERE c.status != 'deleted'
-             ORDER BY c.created_at DESC`
+             ${restricted ? 'AND c.assigned_to = ?' : ''}
+             ORDER BY c.created_at DESC`,
+            params
         );
         res.json(rows);
     } catch (error) {
@@ -114,22 +119,19 @@ router.put('/:id', async (req, res) => {
         }
 
         await pool.query(
-            `UPDATE contacts 
-             SET first_name = ?, last_name = ?, email = ?, cell_phone = ?, 
+            `UPDATE contacts
+             SET first_name = ?, last_name = ?, email = ?, cell_phone = ?,
                  source = ?, source_username = ?, assigned_to = ?, status = ?
              WHERE id = ?`,
-            [
-                first_name, 
-                last_name, 
-                email || null, 
-                cell_phone || null, 
-                source || 'manual', 
-                source_username || null, 
-                assigned_to || null, 
-                status || 'new', 
-                id
-            ]
+            [first_name, last_name, email || null, cell_phone || null,
+             source || 'manual', source_username || null, assigned_to || null, status || 'new', id]
         );
+
+        // Propagate assignment to all leads and loans for this contact
+        if (assigned_to !== undefined) {
+            await pool.query(`UPDATE leads SET assigned_to = ? WHERE contact_id = ?`, [assigned_to || null, id]);
+            await pool.query(`UPDATE loans SET assigned_to = ? WHERE contact_id = ?`, [assigned_to || null, id]);
+        }
 
         res.json({ message: 'Contact updated successfully' });
     } catch (error) {

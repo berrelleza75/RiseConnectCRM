@@ -30,14 +30,19 @@ migrateTable().catch(err => console.error('Messages migration error:', err));
 
 // GET /api/messages/stats  — unread counts + last message per contact
 router.get('/stats', async (req, res) => {
+    const user = req.user;
+    const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
     try {
+        const params = restricted ? [user.id] : [];
         const [rows] = await pool.query(
-            `SELECT contact_id,
-                    MAX(created_at) AS last_message_at,
-                    SUM(CASE WHEN (is_read = 0 OR is_read IS NULL) AND direction = 'inbound' THEN 1 ELSE 0 END) AS unread_count
-             FROM messages
-             WHERE contact_id IS NOT NULL
-             GROUP BY contact_id`
+            `SELECT m.contact_id,
+                    MAX(m.created_at) AS last_message_at,
+                    SUM(CASE WHEN (m.is_read = 0 OR m.is_read IS NULL) AND m.direction = 'inbound' THEN 1 ELSE 0 END) AS unread_count
+             FROM messages m
+             ${restricted ? 'JOIN contacts c ON m.contact_id = c.id AND c.assigned_to = ?' : ''}
+             WHERE m.contact_id IS NOT NULL
+             GROUP BY m.contact_id`,
+            params
         );
         res.json(rows);
     } catch (error) {

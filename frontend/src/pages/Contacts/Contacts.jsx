@@ -45,7 +45,8 @@ function Contacts() {
         cell_phone: '',
         source: 'manual',
         source_username: '',
-        status: 'new'
+        status: 'new',
+        assigned_to: '',
     };
 
     const [formData, setFormData] = useState(emptyForm);
@@ -54,6 +55,9 @@ function Contacts() {
     const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
     const currentUserId = payload.id;
     const currentOfficeId = payload.office_id;
+    const isAdmin = payload.role === 'admin';
+
+    const [teamMembers, setTeamMembers] = useState([]);
 
     const loadContacts = async () => {
         try {
@@ -70,6 +74,12 @@ function Contacts() {
 
     useEffect(() => {
         loadContacts();
+        if (isAdmin && currentOfficeId) {
+            fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001/api'}/users?office_id=${currentOfficeId}`)
+                .then(r => r.json())
+                .then(data => setTeamMembers(data.filter(u => u.role !== 'admin')))
+                .catch(() => {});
+        }
     }, []);
 
     useEffect(() => {
@@ -110,7 +120,8 @@ function Contacts() {
             cell_phone: contact.cell_phone || '',
             source: contact.source || 'manual',
             source_username: contact.source_username || '',
-            status: contact.status || 'new'
+            status: contact.status || 'new',
+            assigned_to: contact.assigned_to ? String(contact.assigned_to) : '',
         });
         setShowModal(true);
     };
@@ -133,17 +144,20 @@ function Contacts() {
                     source: formData.source,
                     source_username: formData.source_username,
                     status: formData.status,
-                    assigned_to: null
+                    assigned_to: formData.assigned_to || null,
                 });
             } else {
                 await createContact({
                     ...formData,
+                    assigned_to: formData.assigned_to || null,
                     office_id: currentOfficeId,
-                    created_by: currentUserId
+                    created_by: currentUserId,
                 });
             }
             closeContactModal();
             loadContacts();
+            setSuccessMessage(editingContactId ? 'Contact updated successfully.' : 'Contact created successfully.');
+            setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err) {
             setError(err.message);
         }
@@ -266,10 +280,10 @@ function Contacts() {
                                     </svg>
                                 </div>
                                 <div className="ct-empty-title">
-                                    {searchQuery ? 'No contacts match your search' : 'No contacts yet'}
+                                    {searchQuery ? 'No contacts match your search' : 'No contacts assigned'}
                                 </div>
                                 <div className="ct-empty-sub">
-                                    {searchQuery ? 'Try a different search term' : 'Add your first contact to get started'}
+                                    {searchQuery ? 'Try a different search term' : 'You have no contacts assigned to you yet. Ask your admin to assign some.'}
                                 </div>
                             </div>
                         )}
@@ -418,6 +432,21 @@ function Contacts() {
                                 <div className="ct-field">
                                     <label>Status</label>
                                     <CustomSelect name="status" value={formData.status} onChange={handleInputChange} options={OPT_STATUS} />
+                                </div>
+                            )}
+
+                            {isAdmin && (
+                                <div className="ct-field">
+                                    <label>Loan Officer Assigned</label>
+                                    <CustomSelect
+                                        name="assigned_to"
+                                        value={formData.assigned_to ? String(formData.assigned_to) : ''}
+                                        onChange={handleInputChange}
+                                        options={[
+                                            { value: '', label: '— Not assigned —' },
+                                            ...teamMembers.map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name} (${u.role === 'loan_officer' ? 'LO' : 'Realtor'})` }))
+                                        ]}
+                                    />
                                 </div>
                             )}
 

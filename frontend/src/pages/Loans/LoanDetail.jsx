@@ -219,6 +219,7 @@ function LoanDetail() {
     const payload = token ? JSON.parse(atob(token.split('.')[1])) : {};
     const userId = payload.id;
     const officeId = payload.office_id;
+    const isAdmin = payload.role === 'admin';
 
     const [loan, setLoan] = useState(null);
     const [form, setForm] = useState({});
@@ -456,17 +457,21 @@ function LoanDetail() {
                                 <div className="lnd-card-hd">Team Assignment</div>
                                 <div className="lnd-field">
                                     <label>Loan Officer Assigned</label>
-                                    <CustomSelect
-                                        name="assigned_to"
-                                        value={form.assigned_to}
-                                        onChange={handleChange}
-                                        options={[
-                                            { value: '', label: '— Not set —' },
-                                            ...officeUsers
-                                                .filter(u => u.id !== userId)
-                                                .map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name}` }))
-                                        ]}
-                                    />
+                                    {isAdmin ? (
+                                        <CustomSelect
+                                            name="assigned_to"
+                                            value={form.assigned_to}
+                                            onChange={handleChange}
+                                            options={[
+                                                { value: '', label: '— Not set —' },
+                                                ...officeUsers
+                                                    .filter(u => u.id !== userId)
+                                                    .map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name}` }))
+                                            ]}
+                                        />
+                                    ) : (
+                                        <div className="lnd-readonly">{loan.assigned_first_name ? `${loan.assigned_first_name} ${loan.assigned_last_name}` : '— Not assigned —'}</div>
+                                    )}
                                 </div>
                             </div>
                         </aside>

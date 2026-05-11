@@ -151,10 +151,10 @@ function Loans() {
                                     </svg>
                                 </div>
                                 <div className="ln-empty-title">
-                                    {searchQuery ? 'No loans match your search' : 'No loans yet'}
+                                    {searchQuery ? 'No loans match your search' : 'No loans assigned'}
                                 </div>
                                 <div className="ln-empty-sub">
-                                    {searchQuery ? 'Try a different search term' : 'Convert a qualified lead into a loan to get started'}
+                                    {searchQuery ? 'Try a different search term' : 'You have no loans assigned to you yet. Ask your admin to assign some.'}
                                 </div>
                             </div>
                         )}

@@ -6,21 +6,32 @@ const router = express.Router();
 // GET /api/appointments?year=2026&month=5
 router.get('/', async (req, res) => {
     const { year, month } = req.query;
+    const user = req.user;
+    const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
     try {
-        let sql = `
+        const conditions = [];
+        const params = [];
+
+        if (year && month) {
+            conditions.push(`YEAR(a.date) = ? AND MONTH(a.date) = ?`);
+            params.push(year, month);
+        }
+        if (restricted) {
+            conditions.push(`(a.assigned_to = ? OR c.assigned_to = ?)`);
+            params.push(user.id, user.id);
+        }
+
+        const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+        const sql = `
             SELECT a.*,
                    c.first_name AS contact_first_name, c.last_name AS contact_last_name,
                    u.first_name AS assigned_first_name, u.last_name AS assigned_last_name
             FROM appointments a
             LEFT JOIN contacts c ON a.contact_id = c.id
             LEFT JOIN users u ON a.assigned_to = u.id
+            ${where}
+            ORDER BY a.date ASC, a.time ASC
         `;
-        const params = [];
-        if (year && month) {
-            sql += ` WHERE YEAR(a.date) = ? AND MONTH(a.date) = ?`;
-            params.push(year, month);
-        }
-        sql += ` ORDER BY a.date ASC, a.time ASC`;
         const [rows] = await pool.query(sql, params);
         res.json(rows);
     } catch (error) {

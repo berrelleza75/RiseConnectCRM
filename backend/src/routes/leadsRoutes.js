@@ -26,6 +26,9 @@ router.get('/stats', async (req, res) => {
 
 router.get('/', async (req, res) => {
     try {
+        const user = req.user;
+        const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
+        const params = restricted ? [user.id] : [];
         const [rows] = await pool.query(
             `SELECT l.id, l.contact_id, l.office_id, l.assigned_to,
                     l.loan_purpose,
@@ -42,7 +45,9 @@ router.get('/', async (req, res) => {
              FROM leads l
              JOIN contacts c ON l.contact_id = c.id
              LEFT JOIN users u ON l.assigned_to = u.id
-             ORDER BY l.created_at DESC`
+             ${restricted ? 'WHERE c.assigned_to = ?' : ''}
+             ORDER BY l.created_at DESC`,
+            params
         );
         res.json(rows);
     } catch (error) {
@@ -130,13 +135,16 @@ router.post('/', async (req, res) => {
         }
 
         const [[contact]] = await pool.query(
-            'SELECT id FROM contacts WHERE id = ?',
+            'SELECT id, assigned_to FROM contacts WHERE id = ?',
             [contact_id]
         );
 
         if (!contact) {
             return res.status(404).json({ message: 'Contact not found' });
         }
+
+        // Inherit assigned_to from contact if not explicitly provided
+        const effectiveAssignedTo = assigned_to || contact.assigned_to || null;
 
         const [result] = await pool.query(
             `INSERT INTO leads (
@@ -152,7 +160,7 @@ router.post('/', async (req, res) => {
                 dnc_request, email_opt_out, sms_opt_out, status
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'working')`,
             [
-                contact_id, office_id, assigned_to || null, loan_purpose || null,
+                contact_id, office_id, effectiveAssignedTo, loan_purpose || null,
                 subject_property_tbd || false, street_address || null, unit_apt || null,
                 city || null, state || null, postal_code || null, county || null,
                 property_type || null, property_occupancy || null,
@@ -225,6 +233,16 @@ router.put('/:id', async (req, res) => {
             `UPDATE leads SET ${updates.join(', ')} WHERE id = ?`,
             values
         );
+
+        // Propagate assigned_to to contact and loans
+        if (req.body.assigned_to !== undefined) {
+            const [[lead]] = await pool.query(`SELECT contact_id FROM leads WHERE id = ?`, [id]);
+            if (lead) {
+                const val = req.body.assigned_to || null;
+                await pool.query(`UPDATE contacts SET assigned_to = ? WHERE id = ?`, [val, lead.contact_id]);
+                await pool.query(`UPDATE loans SET assigned_to = ? WHERE contact_id = ?`, [val, lead.contact_id]);
+            }
+        }
 
         res.json({ message: 'Lead updated successfully' });
     } catch (error) {
