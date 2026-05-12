@@ -367,16 +367,8 @@ function LeadDetail() {
                                 <div className="ldd-card-hd">Team Assignment</div>
                                 <div className="ldd-field">
                                     <label>Loan Officer Assigned</label>
-                                    {isAdmin ? (
-                                        <CustomSelect
-                                            name="assigned_to"
-                                            value={form.assigned_to}
-                                            onChange={handleChange}
-                                            options={teamOpts}
-                                        />
-                                    ) : (
-                                        <div className="ldd-readonly">{lead.assigned_first_name ? `${lead.assigned_first_name} ${lead.assigned_last_name}` : '— Not assigned —'}</div>
-                                    )}
+                                    <div className="ldd-readonly">{lead.assigned_first_name ? `${lead.assigned_first_name} ${lead.assigned_last_name}` : '— Not assigned —'}</div>
+                                    <div className="ldd-readonly-hint">Manage assignment from the contact profile</div>
                                 </div>
                             </div>
                         </div>

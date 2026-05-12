@@ -35,6 +35,8 @@ function Contacts() {
     const [contactToDelete, setContactToDelete] = useState(null);
     const [contactToConvert, setContactToConvert] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
+    const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+    const [pendingSubmit, setPendingSubmit] = useState(false);
     const [editingContactId, setEditingContactId] = useState(null);
     const menuRef = useRef(null);
 
@@ -134,6 +136,12 @@ function Contacts() {
 
     const handleSubmitContact = async (e) => {
         e.preventDefault();
+        setShowSaveConfirm(true);
+    };
+
+    const handleConfirmSave = async () => {
+        setShowSaveConfirm(false);
+        setPendingSubmit(true);
         try {
             if (editingContactId) {
                 await updateContact(editingContactId, {
@@ -160,6 +168,8 @@ function Contacts() {
             setTimeout(() => setSuccessMessage(null), 3000);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setPendingSubmit(false);
         }
     };
 
@@ -438,15 +448,26 @@ function Contacts() {
                             {isAdmin && (
                                 <div className="ct-field">
                                     <label>Loan Officer Assigned</label>
-                                    <CustomSelect
-                                        name="assigned_to"
-                                        value={formData.assigned_to ? String(formData.assigned_to) : ''}
-                                        onChange={handleInputChange}
-                                        options={[
-                                            { value: '', label: '— Not assigned —' },
-                                            ...teamMembers.map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name} (${u.role === 'loan_officer' ? 'LO' : 'Realtor'})` }))
-                                        ]}
-                                    />
+                                    {formData.assigned_to ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                            <div className="ct-assigned-locked">
+                                                {teamMembers.find(u => String(u.id) === String(formData.assigned_to))
+                                                    ? `${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).first_name} ${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).last_name}`
+                                                    : `LO #${formData.assigned_to}`}
+                                            </div>
+                                            <span className="ct-assigned-hint">Assignment is permanent and cannot be changed</span>
+                                        </div>
+                                    ) : (
+                                        <CustomSelect
+                                            name="assigned_to"
+                                            value=""
+                                            onChange={handleInputChange}
+                                            options={[
+                                                { value: '', label: '— Not assigned —' },
+                                                ...teamMembers.map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name} (${u.role === 'loan_officer' ? 'LO' : 'Realtor'})` }))
+                                            ]}
+                                        />
+                                    )}
                                 </div>
                             )}
 
@@ -457,6 +478,35 @@ function Contacts() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {showSaveConfirm && (
+                <div className="ct-modal-overlay" onClick={() => setShowSaveConfirm(false)}>
+                    <div className="ct-confirm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="ct-confirm-icon" style={{ color: 'var(--color-accent)' }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                                <line x1="12" y1="8" x2="12" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <circle cx="12" cy="16.5" r="1" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <h2 className="ct-confirm-title">Save changes?</h2>
+                        <p className="ct-confirm-text">
+                            Are you sure you want to save the changes to this contact?
+                            {isAdmin && formData.assigned_to && (
+                                <><br /><br />
+                                <strong>⚠ Once a loan officer is assigned to this contact, it cannot be changed.</strong>
+                                </>
+                            )}
+                        </p>
+                        <div className="ct-confirm-actions">
+                            <button className="btn-secondary" onClick={() => setShowSaveConfirm(false)}>Cancel</button>
+                            <button className="btn-primary" onClick={handleConfirmSave} disabled={pendingSubmit}>
+                                {pendingSubmit ? 'Saving...' : 'Yes, save'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

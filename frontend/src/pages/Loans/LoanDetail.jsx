@@ -457,21 +457,8 @@ function LoanDetail() {
                                 <div className="lnd-card-hd">Team Assignment</div>
                                 <div className="lnd-field">
                                     <label>Loan Officer Assigned</label>
-                                    {isAdmin ? (
-                                        <CustomSelect
-                                            name="assigned_to"
-                                            value={form.assigned_to}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: '', label: '— Not set —' },
-                                                ...officeUsers
-                                                    .filter(u => u.id !== userId)
-                                                    .map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name}` }))
-                                            ]}
-                                        />
-                                    ) : (
-                                        <div className="lnd-readonly">{loan.assigned_first_name ? `${loan.assigned_first_name} ${loan.assigned_last_name}` : '— Not assigned —'}</div>
-                                    )}
+                                    <div className="lnd-readonly">{loan.assigned_first_name ? `${loan.assigned_first_name} ${loan.assigned_last_name}` : '— Not assigned —'}</div>
+                                    <div className="lnd-readonly-hint">Manage assignment from the contact profile</div>
                                 </div>
                             </div>
                         </aside>

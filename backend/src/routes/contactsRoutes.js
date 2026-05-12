@@ -113,10 +113,13 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        const [[existing]] = await pool.query('SELECT id FROM contacts WHERE id = ?', [id]);
+        const [[existing]] = await pool.query('SELECT id, assigned_to FROM contacts WHERE id = ?', [id]);
         if (!existing) {
             return res.status(404).json({ message: 'Contact not found' });
         }
+
+        // Lock assignment — once set it cannot be changed
+        const finalAssignedTo = existing.assigned_to || assigned_to || null;
 
         await pool.query(
             `UPDATE contacts
@@ -124,13 +127,13 @@ router.put('/:id', async (req, res) => {
                  source = ?, source_username = ?, assigned_to = ?, status = ?
              WHERE id = ?`,
             [first_name, last_name, email || null, cell_phone || null,
-             source || 'manual', source_username || null, assigned_to || null, status || 'new', id]
+             source || 'manual', source_username || null, finalAssignedTo, status || 'new', id]
         );
 
-        // Propagate assignment to all leads and loans for this contact
-        if (assigned_to !== undefined) {
-            await pool.query(`UPDATE leads SET assigned_to = ? WHERE contact_id = ?`, [assigned_to || null, id]);
-            await pool.query(`UPDATE loans SET assigned_to = ? WHERE contact_id = ?`, [assigned_to || null, id]);
+        // Propagate only if this is the first time assigning
+        if (!existing.assigned_to && assigned_to) {
+            await pool.query(`UPDATE leads SET assigned_to = ? WHERE contact_id = ?`, [assigned_to, id]);
+            await pool.query(`UPDATE loans SET assigned_to = ? WHERE contact_id = ?`, [assigned_to, id]);
         }
 
         res.json({ message: 'Contact updated successfully' });
