@@ -74,6 +74,34 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+// GET /api/users/:id/contacts-count — contacts assigned to this user
+router.get('/:id/contacts-count', async (req, res) => {
+    try {
+        const [[{ count }]] = await pool.query(
+            `SELECT COUNT(*) AS count FROM contacts WHERE assigned_to = ? AND status != 'deleted'`,
+            [req.params.id]
+        );
+        res.json({ count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// POST /api/users/:id/reassign — reassign all contacts to another LO then deactivate
+router.post('/:id/reassign', async (req, res) => {
+    const { new_user_id } = req.body;
+    if (!new_user_id) return res.status(400).json({ message: 'new_user_id is required' });
+    try {
+        await pool.query(`UPDATE contacts SET assigned_to = ? WHERE assigned_to = ?`, [new_user_id, req.params.id]);
+        await pool.query(`UPDATE leads SET assigned_to = ? WHERE assigned_to = ?`, [new_user_id, req.params.id]);
+        await pool.query(`UPDATE loans SET assigned_to = ? WHERE assigned_to = ?`, [new_user_id, req.params.id]);
+        await pool.query(`UPDATE users SET status = 'inactive' WHERE id = ?`, [req.params.id]);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // DELETE /api/users/:id — soft delete (set inactive)
 router.delete('/:id', async (req, res) => {
     try {

@@ -118,8 +118,16 @@ router.put('/:id', async (req, res) => {
             return res.status(404).json({ message: 'Contact not found' });
         }
 
-        // Lock assignment — once set it cannot be changed
-        const finalAssignedTo = existing.assigned_to || assigned_to || null;
+        // Lock assignment — once set it cannot be changed UNLESS current LO is inactive
+        let finalAssignedTo = existing.assigned_to || assigned_to || null;
+        if (existing.assigned_to && assigned_to && existing.assigned_to !== assigned_to) {
+            const [[loUser]] = await pool.query(`SELECT status FROM users WHERE id = ?`, [existing.assigned_to]);
+            if (!loUser || loUser.status === 'inactive') {
+                finalAssignedTo = assigned_to; // allow reassignment
+            } else {
+                finalAssignedTo = existing.assigned_to; // keep locked
+            }
+        }
 
         await pool.query(
             `UPDATE contacts

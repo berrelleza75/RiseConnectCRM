@@ -362,3 +362,14 @@
 
 .team-btn-save:hover    { opacity: 0.88; }
 .team-btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.team-reassign-warn {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #5d4037;
+    line-height: 1.6;
+    margin-bottom: 4px;
+}

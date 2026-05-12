@@ -67,11 +67,14 @@ export default function Team() {
     const payload  = token ? JSON.parse(atob(token.split('.')[1])) : {};
     const officeId = payload.office_id;
 
-    const [members, setMembers]   = useState([]);
-    const [loading, setLoading]   = useState(true);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editing, setEditing]   = useState(null);
-    const [form, setForm]         = useState(EMPTY_FORM);
+    const [members, setMembers]       = useState([]);
+    const [loading, setLoading]       = useState(true);
+    const [modalOpen, setModalOpen]   = useState(false);
+    const [editing, setEditing]       = useState(null);
+    const [form, setForm]             = useState(EMPTY_FORM);
+    const [reassignModal, setReassignModal] = useState(null); // { member, count }
+    const [reassignTo, setReassignTo]       = useState('');
+    const [reassigning, setReassigning]     = useState(false);
     const [saving, setSaving]     = useState(false);
     const [formError, setFormError] = useState('');
 
@@ -149,12 +152,40 @@ export default function Team() {
 
     const handleDeactivate = async (member) => {
         if (member.role === 'admin') return;
-        const action = member.status === 'active' ? 'inactive' : 'active';
-        await fetch(`${API_URL}/users/${member.id}`, {
-            method: 'PUT',
+        if (member.status !== 'active') {
+            await fetch(`${API_URL}/users/${member.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...member, status: 'active' }),
+            });
+            loadMembers();
+            return;
+        }
+        const res  = await fetch(`${API_URL}/users/${member.id}/contacts-count`);
+        const data = await res.json();
+        if (data.count > 0) {
+            setReassignTo('');
+            setReassignModal({ member, count: data.count });
+        } else {
+            await fetch(`${API_URL}/users/${member.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...member, status: 'inactive' }),
+            });
+            loadMembers();
+        }
+    };
+
+    const handleReassignAndDeactivate = async () => {
+        if (!reassignTo) return;
+        setReassigning(true);
+        await fetch(`${API_URL}/users/${reassignModal.member.id}/reassign`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...member, status: action }),
+            body: JSON.stringify({ new_user_id: reassignTo }),
         });
+        setReassignModal(null);
+        setReassigning(false);
         loadMembers();
     };
 
@@ -226,6 +257,48 @@ export default function Team() {
                     )}
                 </div>
             </div>
+
+            {/* ── Reassign Modal ── */}
+            {reassignModal && (
+                <div className="team-modal-backdrop" onClick={() => setReassignModal(null)}>
+                    <div className="team-modal" onClick={e => e.stopPropagation()}>
+                        <div className="team-modal-header">
+                            <span>Reassign Contacts</span>
+                            <button className="team-modal-close" onClick={() => setReassignModal(null)}>×</button>
+                        </div>
+                        <div className="team-modal-body">
+                            <div className="team-reassign-warn">
+                                <strong>{reassignModal.member.first_name} {reassignModal.member.last_name}</strong> has <strong>{reassignModal.count} contact{reassignModal.count !== 1 ? 's' : ''}</strong> assigned.
+                                You must reassign them to another loan officer before deactivating.
+                            </div>
+                            <div className="team-field">
+                                <label>Reassign to</label>
+                                <CustomSelect
+                                    value={reassignTo}
+                                    onChange={val => setReassignTo(val)}
+                                    options={[
+                                        { value: '', label: '— Select loan officer —' },
+                                        ...members
+                                            .filter(m => m.id !== reassignModal.member.id && m.status === 'active' && m.role !== 'admin')
+                                            .map(m => ({ value: String(m.id), label: `${m.first_name} ${m.last_name}` }))
+                                    ]}
+                                />
+                            </div>
+                        </div>
+                        <div className="team-modal-footer">
+                            <button className="team-btn-cancel" onClick={() => setReassignModal(null)}>Cancel</button>
+                            <button
+                                className="team-btn-save"
+                                onClick={handleReassignAndDeactivate}
+                                disabled={!reassignTo || reassigning}
+                                style={{ background: '#bf360c' }}
+                            >
+                                {reassigning ? 'Processing...' : 'Reassign & Deactivate'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* ── Modal ── */}
             {modalOpen && (
