@@ -271,6 +271,8 @@ export default function Messages() {
     const officeId = payload.office_id;
     const userId   = payload.id;
 
+    const [twilioNumbers, setTwilioNumbers]   = useState([]);
+    const [fromNumber,    setFromNumber]      = useState('');
     const [contacts, setContacts]             = useState([]);
     const [search, setSearch]                 = useState('');
     const [contactFilter, setContactFilter]   = useState('all');
@@ -308,6 +310,18 @@ export default function Messages() {
 
     useEffect(() => {
         getContacts().then(setContacts).catch(() => {});
+        fetch(`${API_URL}/offices/twilio/numbers`)
+            .then(r => r.json())
+            .then(data => {
+                const nums = data.current || [];
+                setTwilioNumbers(nums);
+                // default to office saved number or first available
+                fetch(`${API_URL}/offices/${officeId}`)
+                    .then(r => r.json())
+                    .then(office => setFromNumber(office.twilio_phone || nums[0]?.phoneNumber || ''))
+                    .catch(() => { if (nums[0]) setFromNumber(nums[0].phoneNumber); });
+            })
+            .catch(() => {});
         refreshStats();
     }, []);
 
@@ -380,7 +394,7 @@ export default function Messages() {
             if (channel === 'sms') {
                 const to = formatPhone(selected.cell_phone);
                 if (!to) { setSendError('This contact has no phone number.'); setSending(false); return; }
-                msg = await sendSms({ contact_id: selected.id, to, body: composeBody.trim(), office_id: officeId, created_by: userId });
+                msg = await sendSms({ contact_id: selected.id, to, body: composeBody.trim(), office_id: officeId, created_by: userId, from: fromNumber });
             } else {
                 if (!selected.email) { setSendError('This contact has no email address.'); setSending(false); return; }
                 msg = await sendEmail({ contact_id: selected.id, to: selected.email, subject: composeSubject.trim() || '(no subject)', body: composeBody.trim(), office_id: officeId, created_by: userId });
@@ -585,6 +599,16 @@ export default function Messages() {
 
                                 <div className="msg-compose">
                                     {sendError && <div className="msg-send-error">{sendError}</div>}
+                                    {channel === 'sms' && twilioNumbers.length > 1 && (
+                                        <div className="msg-from-row">
+                                            <span className="msg-from-label">From:</span>
+                                            <select className="msg-from-select" value={fromNumber} onChange={e => setFromNumber(e.target.value)}>
+                                                {twilioNumbers.map(n => (
+                                                    <option key={n.sid} value={n.phoneNumber}>{n.phoneNumber}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    )}
                                     {channel === 'email' && (
                                         <input className="msg-subject-input" placeholder="Subject..." value={composeSubject} onChange={e => setComposeSubject(e.target.value)} />
                                     )}

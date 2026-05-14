@@ -82,12 +82,12 @@ router.get('/contact/:contactId', async (req, res) => {
 
 // POST /api/messages/sms  — send SMS via Twilio and persist
 router.post('/sms', async (req, res) => {
-    const { contact_id, to, body, office_id, created_by } = req.body;
+    const { contact_id, to, body, office_id, created_by, from } = req.body;
     if (!to || !body) return res.status(400).json({ message: 'to and body required' });
     try {
-        // Use office's selected twilio_phone, fallback to env
-        let fromNumber = process.env.TWILIO_PHONE_NUMBER;
-        if (office_id) {
+        // Use number from request, then office saved number, then env
+        let fromNumber = from || process.env.TWILIO_PHONE_NUMBER;
+        if (!from && office_id) {
             const [[office]] = await pool.query(`SELECT twilio_phone FROM offices WHERE id = ?`, [office_id]);
             if (office?.twilio_phone) fromNumber = office.twilio_phone;
         }
