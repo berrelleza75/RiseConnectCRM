@@ -7,14 +7,10 @@ import { createLead } from '../../services/leadsService';
 import './Contacts.css';
 
 const OPT_SOURCE = [
-    { value: 'manual',    label: 'Manual' },
-    { value: 'instagram', label: 'Instagram' },
-    { value: 'facebook',  label: 'Facebook' },
-    { value: 'tiktok',    label: 'TikTok' },
-    { value: 'whatsapp',  label: 'WhatsApp' },
-    { value: 'referral',  label: 'Referral' },
-    { value: 'website',   label: 'Website' },
-    { value: 'other',     label: 'Other' },
+    { value: 'manual', label: 'Manual' },
+    { value: 'sms',    label: 'SMS' },
+    { value: 'email',  label: 'Email' },
+    { value: 'other',  label: 'Other' },
 ];
 
 const OPT_STATUS = [
@@ -260,9 +256,8 @@ function Contacts() {
 
                     <div className="ct-filters">
                         <button className={`ct-filter ${activeFilter === 'all' ? 'on' : ''}`} onClick={() => setActiveFilter('all')}>All</button>
-                        <button className={`ct-filter ${activeFilter === 'instagram' ? 'on' : ''}`} onClick={() => setActiveFilter('instagram')}>Instagram</button>
-                        <button className={`ct-filter ${activeFilter === 'facebook' ? 'on' : ''}`} onClick={() => setActiveFilter('facebook')}>Facebook</button>
-                        <button className={`ct-filter ${activeFilter === 'tiktok' ? 'on' : ''}`} onClick={() => setActiveFilter('tiktok')}>TikTok</button>
+                        <button className={`ct-filter ${activeFilter === 'sms' ? 'on' : ''}`} onClick={() => setActiveFilter('sms')}>SMS</button>
+                        <button className={`ct-filter ${activeFilter === 'email' ? 'on' : ''}`} onClick={() => setActiveFilter('email')}>Email</button>
                         <button className={`ct-filter ${activeFilter === 'manual' ? 'on' : ''}`} onClick={() => setActiveFilter('manual')}>Manual</button>
                         <button className={`ct-filter ${activeFilter === 'other' ? 'on' : ''}`} onClick={() => setActiveFilter('other')}>Other</button>
                     </div>
@@ -294,10 +289,10 @@ function Contacts() {
                                     </svg>
                                 </div>
                                 <div className="ct-empty-title">
-                                    {searchQuery ? 'No contacts match your search' : 'No contacts assigned'}
+                                    {searchQuery ? 'No contacts match your search' : activeFilter !== 'all' ? `No ${activeFilter} contacts` : 'No contacts assigned'}
                                 </div>
                                 <div className="ct-empty-sub">
-                                    {searchQuery ? 'Try a different search term' : 'You have no contacts assigned to you yet. Ask your admin to assign some.'}
+                                    {searchQuery ? 'Try a different search term' : activeFilter !== 'all' ? `There are no contacts from "${activeFilter}"` : 'You have no contacts assigned to you yet. Ask your admin to assign some.'}
                                 </div>
                             </div>
                         )}

@@ -259,10 +259,10 @@ function Leads() {
                                     </svg>
                                 </div>
                                 <div className="ld-empty-title">
-                                    {searchQuery ? 'No leads match your search' : 'No leads assigned'}
+                                    {searchQuery ? 'No leads match your search' : activeFilter !== 'all' ? `No ${activeFilter} leads` : 'No leads assigned'}
                                 </div>
                                 <div className="ld-empty-sub">
-                                    {searchQuery ? 'Try a different search term' : 'You have no leads assigned to you yet. Ask your admin to assign some.'}
+                                    {searchQuery ? 'Try a different search term' : activeFilter !== 'all' ? `There are no leads with status "${activeFilter}"` : 'You have no leads assigned to you yet. Ask your admin to assign some.'}
                                 </div>
                             </div>
                         )}
