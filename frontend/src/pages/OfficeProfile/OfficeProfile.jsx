@@ -255,10 +255,9 @@ export default function OfficeProfile() {
                                                         {n.capabilities?.MMS   && <span className="op-cap">MMS</span>}
                                                     </div>
                                                 </div>
-                                                {activeNumber === n.phoneNumber
-                                                    ? <span className="op-twilio-using">✓ In use</span>
-                                                    : <button className="op-twilio-select-btn" onClick={() => handleSelectNumber(n.phoneNumber)}>Use this</button>
-                                                }
+                                                {activeNumber === n.phoneNumber && (
+                                                    <span className="op-twilio-using">✓ In use</span>
+                                                )}
                                             </div>
                                         ))}
 

@@ -1,6 +1,9 @@
 import express from 'express';
 import pool from '../config/db.js';
 import twilio from 'twilio';
+import sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const router = express.Router();
 
@@ -106,16 +109,23 @@ router.post('/sms', async (req, res) => {
     }
 });
 
-// POST /api/messages/email  — persist email (sending requires SMTP config)
+// POST /api/messages/email  — send real email via SendGrid
 router.post('/email', async (req, res) => {
     const { contact_id, to, subject, body, office_id, created_by } = req.body;
     if (!to || !body) return res.status(400).json({ message: 'to and body required' });
     try {
+        await sgMail.send({
+            to,
+            from: process.env.SENDGRID_FROM_EMAIL,
+            subject: subject || '(no subject)',
+            text: body,
+            html: `<p>${body.replace(/\n/g, '<br>')}</p>`,
+        });
         const [result] = await pool.query(
             `INSERT INTO messages
-                (office_id, contact_id, channel, direction, to_address, subject, content, msg_status, created_by)
-             VALUES (?, ?, 'email', 'outbound', ?, ?, ?, 'sent', ?)`,
-            [office_id, contact_id, to, subject || '(no subject)', body, created_by]
+                (office_id, contact_id, channel, direction, from_address, to_address, subject, content, msg_status, created_by)
+             VALUES (?, ?, 'email', 'outbound', ?, ?, ?, ?, 'sent', ?)`,
+            [office_id, contact_id, process.env.SENDGRID_FROM_EMAIL, to, subject || '(no subject)', body, created_by]
         );
         const [rows] = await pool.query(`SELECT * FROM messages WHERE id = ?`, [result.insertId]);
         res.json(rows[0]);
