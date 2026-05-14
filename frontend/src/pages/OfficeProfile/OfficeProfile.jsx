@@ -36,6 +36,9 @@ export default function OfficeProfile() {
     const [loadingTwilio,   setLoadingTwilio]   = useState(false);
     const [twilioError,     setTwilioError]     = useState('');
     const [showAvailable,   setShowAvailable]   = useState(false);
+    const [confirmPurchase, setConfirmPurchase] = useState(null);
+    const [purchasing,      setPurchasing]      = useState(false);
+    const [activeNumber,    setActiveNumber]    = useState(null);
 
     useEffect(() => {
         if (!officeId) return;
@@ -44,6 +47,7 @@ export default function OfficeProfile() {
             .then(data => {
                 setOffice(data);
                 setForm({ ...EMPTY, ...data });
+                if (data.twilio_phone) setActiveNumber(data.twilio_phone);
             })
             .catch(() => setError('Could not load office info.'))
             .finally(() => setLoading(false));
@@ -59,6 +63,36 @@ export default function OfficeProfile() {
             .then(data => { setTwilioNumbers(data); })
             .catch(() => setTwilioError('Could not load Twilio numbers.'))
             .finally(() => setLoadingTwilio(false));
+    };
+
+    const handlePurchase = async () => {
+        if (!confirmPurchase) return;
+        setPurchasing(true);
+        try {
+            const res  = await fetch(`${API_URL}/offices/twilio/purchase`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phoneNumber: confirmPurchase, officeId }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message);
+            setActiveNumber(data.phoneNumber);
+            setConfirmPurchase(null);
+            loadTwilioNumbers();
+        } catch (err) {
+            setTwilioError(err.message || 'Purchase failed.');
+        } finally {
+            setPurchasing(false);
+        }
+    };
+
+    const handleSelectNumber = async (phoneNumber) => {
+        await fetch(`${API_URL}/offices/twilio/select`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phoneNumber, officeId }),
+        });
+        setActiveNumber(phoneNumber);
     };
 
     const handleSave = async () => {
@@ -181,7 +215,18 @@ export default function OfficeProfile() {
                                         <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                                     </svg>
                                     Twilio Phone Numbers
+                                    {twilioNumbers && (
+                                        <button className="op-twilio-refresh" onClick={loadTwilioNumbers} disabled={loadingTwilio} title="Refresh">
+                                            ↻
+                                        </button>
+                                    )}
                                 </div>
+
+                                {activeNumber && (
+                                    <div className="op-twilio-active-badge">
+                                        📤 Sending from: <strong>{activeNumber}</strong>
+                                    </div>
+                                )}
 
                                 {!twilioNumbers ? (
                                     <div className="op-twilio-empty-state">
@@ -193,16 +238,22 @@ export default function OfficeProfile() {
                                     </div>
                                 ) : (
                                     <div className="op-twilio-wrap">
-                                        <div className="op-twilio-sub">Active Numbers</div>
+                                        <div className="op-twilio-sub">Your Numbers</div>
                                         {twilioNumbers.current.length === 0 && <div className="op-twilio-empty">No numbers on this account</div>}
                                         {twilioNumbers.current.map(n => (
-                                            <div key={n.sid} className="op-twilio-number active">
-                                                <div className="op-twilio-num">{n.phoneNumber}</div>
-                                                <div className="op-twilio-caps">
-                                                    {n.capabilities?.voice && <span className="op-cap">Voice</span>}
-                                                    {n.capabilities?.SMS   && <span className="op-cap">SMS</span>}
-                                                    {n.capabilities?.MMS   && <span className="op-cap">MMS</span>}
+                                            <div key={n.sid} className={`op-twilio-number active ${activeNumber === n.phoneNumber ? 'selected' : ''}`}>
+                                                <div>
+                                                    <div className="op-twilio-num">{n.phoneNumber}</div>
+                                                    <div className="op-twilio-caps">
+                                                        {n.capabilities?.voice && <span className="op-cap">Voice</span>}
+                                                        {n.capabilities?.SMS   && <span className="op-cap">SMS</span>}
+                                                        {n.capabilities?.MMS   && <span className="op-cap">MMS</span>}
+                                                    </div>
                                                 </div>
+                                                {activeNumber === n.phoneNumber
+                                                    ? <span className="op-twilio-using">✓ In use</span>
+                                                    : <button className="op-twilio-select-btn" onClick={() => handleSelectNumber(n.phoneNumber)}>Use this</button>
+                                                }
                                             </div>
                                         ))}
 
@@ -212,21 +263,39 @@ export default function OfficeProfile() {
 
                                         {showAvailable && (
                                             <>
-                                                <div className="op-twilio-sub" style={{ marginTop: 14 }}>Available Numbers (US)</div>
+                                                <div className="op-twilio-sub" style={{ marginTop: 14 }}>Available Numbers (US) · $1.15/mo each</div>
                                                 {twilioNumbers.available.map(n => (
                                                     <div key={n.phoneNumber} className="op-twilio-number available">
                                                         <div>
                                                             <div className="op-twilio-num">{n.phoneNumber}</div>
-                                                            <div className="op-twilio-loc">{n.locality}, {n.region} · {n.monthlyFee}</div>
+                                                            <div className="op-twilio-loc">{n.locality}, {n.region}</div>
                                                         </div>
-                                                        <div className="op-twilio-caps">
-                                                            {n.capabilities?.voice && <span className="op-cap">Voice</span>}
-                                                            {n.capabilities?.SMS   && <span className="op-cap">SMS</span>}
-                                                        </div>
+                                                        <button className="op-twilio-purchase-btn" onClick={() => setConfirmPurchase(n.phoneNumber)}>
+                                                            Purchase
+                                                        </button>
                                                     </div>
                                                 ))}
                                             </>
                                         )}
+
+                                        {twilioError && <div className="op-error" style={{marginTop:10}}>{twilioError}</div>}
+                                    </div>
+                                )}
+
+                                {/* Confirm Purchase Modal */}
+                                {confirmPurchase && (
+                                    <div className="op-twilio-confirm">
+                                        <div className="op-twilio-confirm-box">
+                                            <div className="op-twilio-confirm-title">Purchase Number</div>
+                                            <p>Are you sure you want to purchase <strong>{confirmPurchase}</strong>?</p>
+                                            <p className="op-twilio-confirm-note">This will charge $1.15/month to your Twilio account.</p>
+                                            <div className="op-twilio-confirm-actions">
+                                                <button className="op-twilio-cancel-btn" onClick={() => setConfirmPurchase(null)}>Cancel</button>
+                                                <button className="op-twilio-confirm-btn" onClick={handlePurchase} disabled={purchasing}>
+                                                    {purchasing ? 'Purchasing...' : 'Yes, Purchase'}
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>

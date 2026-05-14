@@ -252,6 +252,137 @@
 }
 .op-twilio-toggle:hover { background: var(--color-bg-soft); }
 
+.op-twilio-refresh {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    line-height: 1;
+    padding: 0 4px;
+}
+.op-twilio-refresh:hover { color: var(--color-accent); }
+
+.op-twilio-active-badge {
+    background: rgba(39,80,10,0.08);
+    border: 1px solid rgba(39,80,10,0.2);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #27500a;
+    margin-bottom: 14px;
+}
+
+.op-twilio-number.selected {
+    border-color: var(--color-accent);
+    background: rgba(201,168,76,0.08);
+}
+
+.op-twilio-using {
+    font-size: 11px;
+    font-weight: 700;
+    color: #27500a;
+    white-space: nowrap;
+}
+
+.op-twilio-select-btn {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--color-accent);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.op-twilio-select-btn:hover { background: var(--color-accent); color: #fff; }
+
+.op-twilio-purchase-btn {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.op-twilio-purchase-btn:hover { opacity: 0.85; }
+
+.op-twilio-confirm {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,22,40,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.op-twilio-confirm-box {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    width: 360px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.op-twilio-confirm-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+}
+
+.op-twilio-confirm-box p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0 0 8px;
+    line-height: 1.6;
+}
+
+.op-twilio-confirm-note {
+    font-size: 12px !important;
+    color: var(--color-text-muted) !important;
+}
+
+.op-twilio-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.op-twilio-cancel-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-soft);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+}
+
+.op-twilio-confirm-btn {
+    padding: 8px 18px;
+    background: var(--color-accent);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    cursor: pointer;
+}
+.op-twilio-confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .op-error {
     background: #fbe9e7;
     color: #bf360c;
