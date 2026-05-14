@@ -39,8 +39,10 @@ router.get('/stats', async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const user = req.user;
-        const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
-        const params = restricted ? [user.id] : [];
+        const isLO      = user && user.role === 'loan_officer';
+        const isRealtor = user && user.role === 'realtor';
+        const params = [];
+        if (isLO || isRealtor) params.push(user.id);
         const [rows] = await pool.query(
             `SELECT l.*,
                     c.first_name AS contact_first_name,
@@ -52,7 +54,7 @@ router.get('/', async (req, res) => {
              FROM loans l
              JOIN contacts c ON l.contact_id = c.id
              LEFT JOIN users u ON l.assigned_to = u.id
-             ${restricted ? 'WHERE c.assigned_to = ?' : ''}
+             ${isLO ? 'WHERE c.assigned_to = ?' : isRealtor ? 'WHERE c.realtor_id = ?' : ''}
              ORDER BY l.created_at DESC`,
             params
         );

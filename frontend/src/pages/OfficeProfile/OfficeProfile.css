@@ -1,3 +1,41 @@
+.op-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.op-twilio-panel {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+}
+
+.op-twilio-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border-soft);
+}
+
+.op-twilio-empty-state {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
 .op-loading {
     color: var(--color-text-muted);
     font-size: 14px;
@@ -145,6 +183,74 @@
 
 .op-save-btn:hover    { opacity: 0.88; }
 .op-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Twilio section */
+.op-twilio-btn {
+    background: var(--color-accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+.op-twilio-btn:hover    { opacity: 0.88; }
+.op-twilio-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.op-twilio-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+.op-twilio-sub {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.op-twilio-number {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.op-twilio-number.active    { background: rgba(39,80,10,0.06); border-color: rgba(39,80,10,0.2); }
+.op-twilio-number.available { background: var(--color-bg-soft); }
+
+.op-twilio-num  { font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+.op-twilio-loc  { font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+.op-twilio-empty { font-size: 13px; color: var(--color-text-muted); }
+
+.op-twilio-caps { display: flex; gap: 4px; }
+
+.op-cap {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(201,168,76,0.15);
+    color: var(--color-accent);
+}
+
+.op-twilio-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 7px 14px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: background 0.15s;
+    margin-top: 4px;
+}
+.op-twilio-toggle:hover { background: var(--color-bg-soft); }
 
 .op-error {
     background: #fbe9e7;

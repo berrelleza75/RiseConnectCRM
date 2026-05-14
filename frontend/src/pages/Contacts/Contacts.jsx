@@ -49,6 +49,7 @@ function Contacts() {
         source_username: '',
         status: 'new',
         assigned_to: '',
+        realtor_id: '',
     };
 
     const [formData, setFormData] = useState(emptyForm);
@@ -124,6 +125,7 @@ function Contacts() {
             source_username: contact.source_username || '',
             status: contact.status || 'new',
             assigned_to: contact.assigned_to ? String(contact.assigned_to) : '',
+            realtor_id:  contact.realtor_id  ? String(contact.realtor_id)  : '',
         });
         setShowModal(true);
     };
@@ -153,11 +155,13 @@ function Contacts() {
                     source_username: formData.source_username,
                     status: formData.status,
                     assigned_to: formData.assigned_to || null,
+                    realtor_id:  formData.realtor_id  || null,
                 });
             } else {
                 await createContact({
                     ...formData,
                     assigned_to: formData.assigned_to || null,
+                    realtor_id:  formData.realtor_id  || null,
                     office_id: currentOfficeId,
                     created_by: currentUserId,
                 });
@@ -446,29 +450,54 @@ function Contacts() {
                             )}
 
                             {isAdmin && (
-                                <div className="ct-field">
-                                    <label>Loan Officer Assigned</label>
-                                    {formData.assigned_to ? (
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                            <div className="ct-assigned-locked">
-                                                {teamMembers.find(u => String(u.id) === String(formData.assigned_to))
-                                                    ? `${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).first_name} ${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).last_name}`
-                                                    : `LO #${formData.assigned_to}`}
+                                <>
+                                    <div className="ct-field">
+                                        <label>Loan Officer Assigned</label>
+                                        {formData.assigned_to ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                                <div className="ct-assigned-locked">
+                                                    {teamMembers.find(u => String(u.id) === String(formData.assigned_to))
+                                                        ? `${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).first_name} ${teamMembers.find(u => String(u.id) === String(formData.assigned_to)).last_name}`
+                                                        : `LO #${formData.assigned_to}`}
+                                                </div>
+                                                <span className="ct-assigned-hint">Assignment is permanent and cannot be changed</span>
                                             </div>
-                                            <span className="ct-assigned-hint">Assignment is permanent and cannot be changed</span>
-                                        </div>
-                                    ) : (
-                                        <CustomSelect
-                                            name="assigned_to"
-                                            value=""
-                                            onChange={handleInputChange}
-                                            options={[
-                                                { value: '', label: '— Not assigned —' },
-                                                ...teamMembers.map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name} (${u.role === 'loan_officer' ? 'LO' : 'Realtor'})` }))
-                                            ]}
-                                        />
-                                    )}
-                                </div>
+                                        ) : (
+                                            <CustomSelect
+                                                name="assigned_to"
+                                                value=""
+                                                onChange={handleInputChange}
+                                                options={[
+                                                    { value: '', label: '— Not assigned —' },
+                                                    ...teamMembers.filter(u => u.role === 'loan_officer').map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name}` }))
+                                                ]}
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="ct-field">
+                                        <label>Realtor Assigned</label>
+                                        {formData.realtor_id ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                                <div className="ct-assigned-locked">
+                                                    {teamMembers.find(u => String(u.id) === String(formData.realtor_id))
+                                                        ? `${teamMembers.find(u => String(u.id) === String(formData.realtor_id)).first_name} ${teamMembers.find(u => String(u.id) === String(formData.realtor_id)).last_name}`
+                                                        : `Realtor #${formData.realtor_id}`}
+                                                </div>
+                                                <span className="ct-assigned-hint">Assignment is permanent and cannot be changed</span>
+                                            </div>
+                                        ) : (
+                                            <CustomSelect
+                                                name="realtor_id"
+                                                value=""
+                                                onChange={handleInputChange}
+                                                options={[
+                                                    { value: '', label: '— Not assigned —' },
+                                                    ...teamMembers.filter(u => u.role === 'realtor').map(u => ({ value: String(u.id), label: `${u.first_name} ${u.last_name}` }))
+                                                ]}
+                                            />
+                                        )}
+                                    </div>
+                                </>
                             )}
 
                             <div className="ct-modal-actions">

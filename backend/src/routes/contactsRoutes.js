@@ -6,18 +6,26 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const user = req.user;
-        const restricted = user && (user.role === 'loan_officer' || user.role === 'realtor');
-        const params = restricted ? [user.id] : [];
+        const isLO      = user && user.role === 'loan_officer';
+        const isRealtor = user && user.role === 'realtor';
+        const params = [];
+        let roleFilter = '';
+        if (isLO)      { roleFilter = 'AND c.assigned_to = ?'; params.push(user.id); }
+        if (isRealtor) { roleFilter = 'AND c.realtor_id = ?';  params.push(user.id); }
+
         const [rows] = await pool.query(
             `SELECT c.id, c.first_name, c.last_name, c.email, c.cell_phone,
                     c.source, c.source_username, c.status, c.created_at,
-                    c.assigned_to,
+                    c.assigned_to, c.realtor_id,
                     u.first_name AS assigned_first_name,
-                    u.last_name AS assigned_last_name
+                    u.last_name  AS assigned_last_name,
+                    r.first_name AS realtor_first_name,
+                    r.last_name  AS realtor_last_name
              FROM contacts c
              LEFT JOIN users u ON c.assigned_to = u.id
+             LEFT JOIN users r ON c.realtor_id  = r.id
              WHERE c.status != 'deleted'
-             ${restricted ? 'AND c.assigned_to = ?' : ''}
+             ${roleFilter}
              ORDER BY c.created_at DESC`,
             params
         );
@@ -102,9 +110,9 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const { 
-            first_name, last_name, email, cell_phone, 
-            source, source_username, assigned_to, status 
+        const {
+            first_name, last_name, email, cell_phone,
+            source, source_username, assigned_to, realtor_id, status
         } = req.body;
 
         if (!first_name || !last_name) {
@@ -113,35 +121,45 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        const [[existing]] = await pool.query('SELECT id, assigned_to FROM contacts WHERE id = ?', [id]);
+        const [[existing]] = await pool.query('SELECT id, assigned_to, realtor_id FROM contacts WHERE id = ?', [id]);
         if (!existing) {
             return res.status(404).json({ message: 'Contact not found' });
         }
 
-        // Lock assignment — once set it cannot be changed UNLESS current LO is inactive
+        // Lock LO — once set cannot change unless inactive
         let finalAssignedTo = existing.assigned_to || assigned_to || null;
-        if (existing.assigned_to && assigned_to && existing.assigned_to !== assigned_to) {
+        if (existing.assigned_to && assigned_to && existing.assigned_to !== parseInt(assigned_to)) {
             const [[loUser]] = await pool.query(`SELECT status FROM users WHERE id = ?`, [existing.assigned_to]);
-            if (!loUser || loUser.status === 'inactive') {
-                finalAssignedTo = assigned_to; // allow reassignment
-            } else {
-                finalAssignedTo = existing.assigned_to; // keep locked
-            }
+            if (!loUser || loUser.status === 'inactive') finalAssignedTo = assigned_to;
+            else finalAssignedTo = existing.assigned_to;
+        }
+
+        // Lock Realtor — same logic
+        let finalRealtorId = existing.realtor_id || realtor_id || null;
+        if (existing.realtor_id && realtor_id && existing.realtor_id !== parseInt(realtor_id)) {
+            const [[rUser]] = await pool.query(`SELECT status FROM users WHERE id = ?`, [existing.realtor_id]);
+            if (!rUser || rUser.status === 'inactive') finalRealtorId = realtor_id;
+            else finalRealtorId = existing.realtor_id;
         }
 
         await pool.query(
             `UPDATE contacts
              SET first_name = ?, last_name = ?, email = ?, cell_phone = ?,
-                 source = ?, source_username = ?, assigned_to = ?, status = ?
+                 source = ?, source_username = ?, assigned_to = ?, realtor_id = ?, status = ?
              WHERE id = ?`,
             [first_name, last_name, email || null, cell_phone || null,
-             source || 'manual', source_username || null, finalAssignedTo, status || 'new', id]
+             source || 'manual', source_username || null, finalAssignedTo, finalRealtorId, status || 'new', id]
         );
 
-        // Propagate only if this is the first time assigning
+        // Propagate LO if first time
         if (!existing.assigned_to && assigned_to) {
             await pool.query(`UPDATE leads SET assigned_to = ? WHERE contact_id = ?`, [assigned_to, id]);
             await pool.query(`UPDATE loans SET assigned_to = ? WHERE contact_id = ?`, [assigned_to, id]);
+        }
+        // Propagate Realtor if first time
+        if (!existing.realtor_id && realtor_id) {
+            await pool.query(`UPDATE leads SET realtor_id = ? WHERE contact_id = ?`, [realtor_id, id]);
+            await pool.query(`UPDATE loans SET realtor_id = ? WHERE contact_id = ?`, [realtor_id, id]);
         }
 
         res.json({ message: 'Contact updated successfully' });

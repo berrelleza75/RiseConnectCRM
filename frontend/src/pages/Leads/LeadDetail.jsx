@@ -370,6 +370,11 @@ function LeadDetail() {
                                     <div className="ldd-readonly">{lead.assigned_first_name ? `${lead.assigned_first_name} ${lead.assigned_last_name}` : '— Not assigned —'}</div>
                                     <div className="ldd-readonly-hint">Manage assignment from the contact profile</div>
                                 </div>
+                                <div className="ldd-field" style={{ marginTop: 10 }}>
+                                    <label>Realtor Assigned</label>
+                                    <div className="ldd-readonly">{lead.realtor_first_name ? `${lead.realtor_first_name} ${lead.realtor_last_name}` : '— Not assigned —'}</div>
+                                    <div className="ldd-readonly-hint">Manage assignment from the contact profile</div>
+                                </div>
                             </div>
                         </div>
 

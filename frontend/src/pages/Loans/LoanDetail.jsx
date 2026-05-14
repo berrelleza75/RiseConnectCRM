@@ -460,6 +460,11 @@ function LoanDetail() {
                                     <div className="lnd-readonly">{loan.assigned_first_name ? `${loan.assigned_first_name} ${loan.assigned_last_name}` : '— Not assigned —'}</div>
                                     <div className="lnd-readonly-hint">Manage assignment from the contact profile</div>
                                 </div>
+                                <div className="lnd-field" style={{ marginTop: 10 }}>
+                                    <label>Realtor Assigned</label>
+                                    <div className="lnd-readonly">{loan.realtor_first_name ? `${loan.realtor_first_name} ${loan.realtor_last_name}` : '— Not assigned —'}</div>
+                                    <div className="lnd-readonly-hint">Manage assignment from the contact profile</div>
+                                </div>
                             </div>
                         </aside>
 

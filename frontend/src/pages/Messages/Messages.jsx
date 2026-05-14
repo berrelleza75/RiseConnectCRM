@@ -397,7 +397,10 @@ export default function Messages() {
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSend();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
     };
 
     const handleSaveLead = async (form) => {
@@ -606,7 +609,11 @@ export default function Messages() {
                                             )}
                                         </button>
                                     </div>
-                                    <div className="msg-compose-hint">Ctrl+Enter to send</div>
+                                    <div className="msg-compose-hint">
+                                        {channel === 'sms'
+                                            ? `Sending from ${process.env.REACT_APP_TWILIO_PHONE || '+14322551476'} · Enter to send · Shift+Enter for new line`
+                                            : 'Enter to send · Shift+Enter for new line'}
+                                    </div>
                                 </div>
                             </>
                         )}

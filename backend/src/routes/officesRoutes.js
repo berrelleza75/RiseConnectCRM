@@ -1,7 +1,32 @@
 import express from 'express';
 import pool from '../config/db.js';
+import twilio from 'twilio';
 
 const router = express.Router();
+
+// GET /api/offices/twilio/numbers
+router.get('/twilio/numbers', async (req, res) => {
+    try {
+        const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+        const [current, available] = await Promise.all([
+            client.incomingPhoneNumbers.list({ limit: 20 }),
+            client.availablePhoneNumbers('US').local.list({ limit: 20 }),
+        ]);
+        res.json({
+            current: current.map(n => ({
+                sid: n.sid, phoneNumber: n.phoneNumber,
+                friendlyName: n.friendlyName, capabilities: n.capabilities,
+            })),
+            available: available.map(n => ({
+                phoneNumber: n.phoneNumber, friendlyName: n.friendlyName,
+                locality: n.locality, region: n.region,
+                capabilities: n.capabilities, monthlyFee: '$1.15/mo',
+            })),
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 // GET /api/offices/:id
 router.get('/:id', async (req, res) => {
@@ -29,5 +54,6 @@ router.put('/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 export default router;
