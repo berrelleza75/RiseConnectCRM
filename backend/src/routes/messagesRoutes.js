@@ -85,16 +85,19 @@ router.post('/sms', async (req, res) => {
     const { contact_id, to, body, office_id, created_by } = req.body;
     if (!to || !body) return res.status(400).json({ message: 'to and body required' });
     try {
-        const msg = await twilioClient.messages.create({
-            body,
-            from: process.env.TWILIO_PHONE_NUMBER,
-            to,
-        });
+        // Use office's selected twilio_phone, fallback to env
+        let fromNumber = process.env.TWILIO_PHONE_NUMBER;
+        if (office_id) {
+            const [[office]] = await pool.query(`SELECT twilio_phone FROM offices WHERE id = ?`, [office_id]);
+            if (office?.twilio_phone) fromNumber = office.twilio_phone;
+        }
+
+        const msg = await twilioClient.messages.create({ body, from: fromNumber, to });
         const [result] = await pool.query(
             `INSERT INTO messages
                 (office_id, contact_id, channel, direction, from_address, to_address, content, msg_status, twilio_sid, created_by)
              VALUES (?, ?, 'sms', 'outbound', ?, ?, ?, ?, ?, ?)`,
-            [office_id, contact_id, process.env.TWILIO_PHONE_NUMBER, to, body, msg.status, msg.sid, created_by]
+            [office_id, contact_id, fromNumber, to, body, msg.status, msg.sid, created_by]
         );
         const [rows] = await pool.query(`SELECT * FROM messages WHERE id = ?`, [result.insertId]);
         res.json(rows[0]);

@@ -254,15 +254,29 @@
 
 .op-twilio-refresh {
     margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--color-bg-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
-    color: var(--color-text-muted);
-    line-height: 1;
-    padding: 0 4px;
+    color: var(--color-text-secondary);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.op-twilio-refresh:hover { color: var(--color-accent); }
+.op-twilio-refresh:hover:not(:disabled) {
+    background: var(--color-accent);
+    color: #fff;
+    border-color: var(--color-accent);
+}
+.op-twilio-refresh:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.op-spin { animation: spin 0.8s linear infinite; }
 
 .op-twilio-active-badge {
     background: rgba(39,80,10,0.08);
